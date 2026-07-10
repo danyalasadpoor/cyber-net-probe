@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient, useServerFn } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { probeAdHoc, probeBatch, createScanJob } from "@/lib/probe.functions";
 import { useServerFn as useSFn } from "@tanstack/react-start";
