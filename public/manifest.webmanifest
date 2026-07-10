@@ -1,0 +1,13 @@
+{
+  "name": "NetWatch Pro",
+  "short_name": "NetWatch",
+  "description": "Enterprise network monitoring & uptime analytics",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#050816",
+  "background_color": "#050816",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }
+  ]
+}
