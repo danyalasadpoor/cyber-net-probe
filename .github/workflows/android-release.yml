@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    name: Build Android Release APK
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     defaults:
@@ -47,21 +47,21 @@ jobs:
       - name: Make Gradle executable
         run: chmod +x android/gradlew
 
-      - name: Build APK
+      - name: Build Debug APK
         working-directory: netwatch-pro/android
         run: |
-          ./gradlew --no-daemon assembleRelease
+          ./gradlew --no-daemon assembleDebug
 
       - name: Prepare APK
         working-directory: netwatch-pro
         run: |
           mkdir -p artifacts
-          cp android/app/build/outputs/apk/release/*.apk artifacts/netwatch-pro-release.apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk artifacts/netwatch-pro-debug.apk
           ls -la artifacts
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: netwatch-pro-release-apk
-          path: netwatch-pro/artifacts/netwatch-pro-release.apk
+          name: netwatch-pro-debug-apk
+          path: netwatch-pro/artifacts/netwatch-pro-debug.apk
           retention-days: 90
