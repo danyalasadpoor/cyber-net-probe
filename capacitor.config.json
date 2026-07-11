@@ -1,7 +1,0 @@
-{
-  "appId": "app.lovable.netwatchpro",
-  "appName": "NetWatch Pro",
-  "webDir": "dist",
-  "backgroundColor": "#050816",
-  "android": { "allowMixedContent": true }
-}
