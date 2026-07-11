@@ -15,7 +15,12 @@ export default function Scanner() {
   const [count, setCount] = useState<number>(100);
   const [results, setResults] = useState<Target[]>([]);
 
-  useEffect(() => scanner.subscribe(setProgress), []);
+  useEffect(() => {
+    const unsub = scanner.subscribe(setProgress);
+    return () => {
+      unsub();
+    };
+  }, []);
   useEffect(() => {
     const load = () =>
       listTargets({ limit: 50, offset: 0 }).then((r) => setResults(r.rows));
