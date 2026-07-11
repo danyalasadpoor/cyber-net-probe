@@ -1,32 +1,75 @@
-name: Android Build
+name: Android Debug APK
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
+    name: Build Debug APK
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: netwatch-pro
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: netwatch-pro/package-lock.json
 
-      - name: Install dependencies
+      - name: Setup Java (Temurin 21)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install npm dependencies
         run: npm install
 
-      - name: Build Web App
+      - name: Build web assets
         run: npm run build
 
-      - name: Upload build files
+      - name: Capacitor sync (android)
+        run: npx cap sync android
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Gradle cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('netwatch-pro/android/**/*.gradle*', 'netwatch-pro/android/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Assemble debug APK
+        working-directory: netwatch-pro/android
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Rename APK
+        run: |
+          mkdir -p artifacts
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+             artifacts/netwatch-pro-debug.apk
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-build
-          path: dist
+          name: netwatch-pro-debug-apk
+          path: netwatch-pro/artifacts/netwatch-pro-debug.apk
+          if-no-files-found: error
+          retention-days: 30
