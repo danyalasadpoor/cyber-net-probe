@@ -1071,3 +1071,19 @@ export async function scanTrend(days = 14) {
   return result.values ?? [];
 
 }
+export async function categories() {
+
+  const result = await getDb().query(
+    `
+    SELECT DISTINCT category
+    FROM targets
+    ORDER BY category ASC
+    `
+  );
+
+
+  return (result.values ?? [])
+    .map((r:any) => r.category)
+    .filter(Boolean);
+
+}
