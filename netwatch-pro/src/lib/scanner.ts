@@ -61,10 +61,13 @@ class ScannerEngine {
 
     this.listeners.add(listener);
 
-    listener(this.progress);
+    listener({
+      ...this.progress
+    });
 
-    return () =>
+    return () => {
       this.listeners.delete(listener);
+    };
 
   }
 
@@ -119,7 +122,7 @@ class ScannerEngine {
       return;
 
 
-    await new Promise<void>(resolve => {
+    await new Promise<void>((resolve) => {
 
       this.pauseResolver = resolve;
 
@@ -160,7 +163,7 @@ class ScannerEngine {
     this.progress.paused = false;
 
 
-    if(this.pauseResolver){
+    if (this.pauseResolver) {
 
       this.pauseResolver();
 
@@ -184,14 +187,14 @@ class ScannerEngine {
 
   stop() {
 
-    if(!this.progress.running)
+    if (!this.progress.running)
       return;
 
 
     this.cancelRequested = true;
 
 
-    if(this.pauseResolver){
+    if (this.pauseResolver) {
 
       this.pauseResolver();
 
@@ -204,6 +207,7 @@ class ScannerEngine {
       "Stopping scanner..."
     );
 
+
   }
 
 
@@ -211,9 +215,9 @@ class ScannerEngine {
 
 
   async probe(
-    address:string,
-    timeout:number
-  ):Promise<number|null>{
+    address: string,
+    timeout: number
+  ): Promise<number | null> {
 
 
     const start =
@@ -224,23 +228,20 @@ class ScannerEngine {
       new AbortController();
 
 
-
     const timer =
       setTimeout(
-        ()=>controller.abort(),
+        () => controller.abort(),
         timeout
       );
 
 
     try {
 
+      let url =
+        address.trim();
 
-      let url = address.trim();
 
-
-      if(
-        !url.startsWith("http")
-      ){
+      if (!url.startsWith("http")) {
 
         url =
           "https://" + url;
@@ -252,11 +253,10 @@ class ScannerEngine {
       await fetch(
         url,
         {
-          method:"GET",
-          mode:"no-cors",
-          cache:"no-store",
-          signal:
-            controller.signal
+          method: "GET",
+          mode: "no-cors",
+          cache: "no-store",
+          signal: controller.signal,
         }
       );
 
@@ -267,13 +267,11 @@ class ScannerEngine {
       );
 
 
-    }
-    catch{
+    } catch {
 
       return null;
 
-    }
-    finally{
+    } finally {
 
       clearTimeout(timer);
 
@@ -286,11 +284,11 @@ class ScannerEngine {
 
 
   private async loadTargets(
-    count:number
-  ):Promise<Target[]>{
+    count: number
+  ): Promise<Target[]> {
 
 
-    const result:Target[] = [];
+    const result: Target[] = [];
 
     const pageSize = 500;
 
@@ -298,19 +296,20 @@ class ScannerEngine {
 
 
 
-    while(
+    while (
       result.length < count
-    ){
+    ) {
+
 
       const page =
         await listTargets({
-          limit:pageSize,
-          offset
+          limit: pageSize,
+          offset,
         });
 
 
 
-      if(!page.rows.length)
+      if (!page.rows.length)
         break;
 
 
@@ -324,7 +323,7 @@ class ScannerEngine {
 
 
 
-      if(
+      if (
         page.rows.length < pageSize
       )
         break;
@@ -340,57 +339,51 @@ class ScannerEngine {
 
   }
 
+private async loadTargets(
+    count: number
+  ): Promise<Target[]> {
 
+    ...
+  }
 
+async start(count: number) {
 
-
-  async start(
-    count:number
-  ){
-
-
-    if(this.progress.running)
+    if (this.progress.running)
       return;
 
 
-
-    const settings =
-      useSettings.getState();
-
-
-    const timeout =
-      settings.timeout;
+    const {
+      timeout,
+      concurrency
+    } = useSettings.getState();
 
 
-    const concurrency =
-      Math.min(
-        50,
-        Math.max(
-          1,
-          settings.concurrency
+
+    const limit =
+      Math.max(
+        1,
+        Math.min(
+          count,
+          200000
         )
       );
 
 
 
     const targets =
-      await this.loadTargets(
-        count
-      );
+      await this.loadTargets(limit);
 
 
 
-    if(!targets.length){
+    if (!targets.length) {
 
       log.error(
-        "No targets found"
+        "No targets found in database"
       );
 
       return;
 
     }
-
-
 
 
 
@@ -416,34 +409,33 @@ class ScannerEngine {
       total:
         targets.length,
 
-      completed:0,
+      completed: 0,
 
-      online:0,
+      online: 0,
 
-      offline:0,
+      offline: 0,
 
-      running:true,
+      running: true,
 
-      paused:false,
+      paused: false,
 
       startedAt:
         Date.now(),
 
-      speed:0,
+      speed: 0,
 
-      eta:0
+      eta: 0,
 
     };
 
 
 
-    this.emit();
-
-
-
     log.info(
-      `Scan ${scanId} started with ${targets.length} targets`
+      Scan #${scanId} started (${targets.length} targets)
     );
+
+
+    this.emit();
 
 
 
@@ -455,9 +447,13 @@ class ScannerEngine {
     const workers =
       Array.from(
         {
-          length:concurrency
+          length:
+            Math.max(
+              1,
+              concurrency
+            )
         },
-        ()=>
+        () =>
           this.worker(
             queue,
             timeout,
@@ -473,13 +469,11 @@ class ScannerEngine {
 
 
 
-    const avg =
+    const avgLatency =
       this.latencyCount
-      ?
-      this.latencySum /
-      this.latencyCount
-      :
-      null;
+        ? this.latencySum /
+          this.latencyCount
+        : null;
 
 
 
@@ -487,7 +481,7 @@ class ScannerEngine {
       scanId,
       this.progress.online,
       this.progress.offline,
-      avg,
+      avgLatency,
       this.cancelRequested
     );
 
@@ -497,13 +491,14 @@ class ScannerEngine {
       false;
 
 
+
     this.emit();
 
 
-    log.success(
-      `Scan finished: ${this.progress.online} online / ${this.progress.offline} offline`
-    );
 
+    log.success(
+      Scan finished: ${this.progress.online} online / ${this.progress.offline} offline
+    );
 
   }
 
@@ -512,21 +507,25 @@ class ScannerEngine {
 
 
   private async worker(
-    queue:Target[],
-    timeout:number,
-    scanId:number
-  ){
+    queue: Target[],
+    timeout: number,
+    scanId: number
+  ) {
+
+
+    const updates: Array<{
+      id:number;
+      status:string;
+      latency:number|null;
+      ts:number;
+    }> = [];
 
 
 
-    const updates:any[] = [];
-
-
-
-    while(
+    while (
       queue.length &&
       !this.cancelRequested
-    ){
+    ) {
 
 
       await this.waitPause();
@@ -538,7 +537,7 @@ class ScannerEngine {
 
 
 
-      if(!target)
+      if (!target)
         break;
 
 
@@ -556,30 +555,27 @@ class ScannerEngine {
 
 
 
-      const online =
-        latency !== null;
-
-
-
       const status =
-        online
-        ?
-        "online"
-        :
-        "offline";
+        latency !== null
+          ? "online"
+          : "offline";
 
 
 
-      if(online){
+      if (status === "online") {
 
         this.progress.online++;
 
-        this.latencySum += latency!;
 
-        this.latencyCount++;
+        if (latency !== null) {
 
-      }
-      else{
+          this.latencySum += latency;
+
+          this.latencyCount++;
+
+        }
+
+      } else {
 
         this.progress.offline++;
 
@@ -593,30 +589,32 @@ class ScannerEngine {
 
       updates.push({
 
-        id:target.id,
+        id:
+          target.id,
 
         status,
 
         latency,
 
-        ts:Date.now()
+        ts:
+          Date.now(),
 
       });
 
 
 
-      await addScanSample(
+      addScanSample(
         scanId,
         target.id,
         status,
         latency
-      );
+      ).catch(()=>{});
 
 
 
-      if(
+      if (
         updates.length >= 50
-      ){
+      ) {
 
         await updateStatusMany(
           updates.splice(0)
@@ -633,7 +631,7 @@ class ScannerEngine {
 
 
 
-    if(updates.length){
+    if (updates.length) {
 
       await updateStatusMany(
         updates
