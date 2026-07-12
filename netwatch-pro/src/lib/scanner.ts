@@ -5,9 +5,11 @@ import {
   finishScan,
   addScanSample,
 } from "./db";
+
 import { log } from "./logger";
 import { useSettings } from "@/store/settings";
 import type { Target } from "@/types";
+
 
 export interface ScanProgress {
   scanId: number;
@@ -19,14 +21,18 @@ export interface ScanProgress {
   paused: boolean;
   startedAt: number;
   currentTarget?: string;
-  speed: number; // per sec
-  eta: number; // seconds
+  speed: number;
+  eta: number;
 }
+
 
 type Listener = (p: ScanProgress) => void;
 
+
 class ScannerEngine {
+
   private listeners = new Set<Listener>();
+
   private progress: ScanProgress = {
     scanId: 0,
     total: 0,
@@ -39,172 +45,607 @@ class ScannerEngine {
     speed: 0,
     eta: 0,
   };
+
+
   private cancelRequested = false;
+
   private pauseResolver: (() => void) | null = null;
+
   private latencySum = 0;
+
   private latencyCount = 0;
 
-  subscribe(l: Listener) {
-    this.listeners.add(l);
-    l(this.progress);
-    return () => this.listeners.delete(l);
+
+
+  subscribe(listener: Listener) {
+
+    this.listeners.add(listener);
+
+    listener(this.progress);
+
+    return () =>
+      this.listeners.delete(listener);
+
   }
+
+
 
   private emit() {
-    const now = Date.now();
-    const elapsed = Math.max(1, (now - this.progress.startedAt) / 1000);
-    this.progress.speed = this.progress.completed / elapsed;
-    const remaining = this.progress.total - this.progress.completed;
-    this.progress.eta = this.progress.speed > 0 ? remaining / this.progress.speed : 0;
-    for (const l of this.listeners) l({ ...this.progress });
+
+    if (!this.progress.startedAt)
+      return;
+
+
+    const elapsed =
+      Math.max(
+        1,
+        (Date.now() - this.progress.startedAt) / 1000
+      );
+
+
+    this.progress.speed =
+      this.progress.completed / elapsed;
+
+
+    const remaining =
+      this.progress.total -
+      this.progress.completed;
+
+
+    this.progress.eta =
+      this.progress.speed > 0
+        ? remaining / this.progress.speed
+        : 0;
+
+
+
+    for (const listener of this.listeners) {
+
+      listener({
+        ...this.progress
+      });
+
+    }
+
   }
 
-  private async awaitPause() {
-    if (!this.progress.paused) return;
-    await new Promise<void>((resolve) => {
+
+
+
+
+  private async waitPause() {
+
+    if (!this.progress.paused)
+      return;
+
+
+    await new Promise<void>(resolve => {
+
       this.pauseResolver = resolve;
+
     });
+
   }
+
+
+
+
 
   pause() {
-    if (!this.progress.running || this.progress.paused) return;
+
+    if (!this.progress.running)
+      return;
+
+
     this.progress.paused = true;
-    log.warn("Scan paused");
+
+    log.warn(
+      "Scanner paused"
+    );
+
     this.emit();
+
   }
+
+
+
+
 
   resume() {
-    if (!this.progress.paused) return;
+
+    if (!this.progress.paused)
+      return;
+
+
     this.progress.paused = false;
-    log.info("Scan resumed");
-    if (this.pauseResolver) {
+
+
+    if(this.pauseResolver){
+
       this.pauseResolver();
+
       this.pauseResolver = null;
+
     }
+
+
+    log.info(
+      "Scanner resumed"
+    );
+
+
     this.emit();
+
   }
+
+
+
+
 
   stop() {
-    if (!this.progress.running) return;
-    this.cancelRequested = true;
-    if (this.pauseResolver) {
-      this.pauseResolver();
-      this.pauseResolver = null;
-    }
-    log.warn("Scan cancellation requested");
-  }
 
-  async probe(address: string, timeout: number): Promise<number | null> {
-    const started = performance.now();
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
-    try {
-      // no-cors HEAD; opaque response is OK — we only care about reachability
-      await fetch(address, {
-        method: "GET",
-        mode: "no-cors",
-        signal: controller.signal,
-        cache: "no-store",
-      });
-      return performance.now() - started;
-    } catch {
-      return null;
-    } finally {
-      clearTimeout(timer);
-    }
-  }
-
-  async start(count: number) {
-    if (this.progress.running) return;
-    const { timeout, concurrency } = useSettings.getState();
-    const limit = Math.max(1, Math.min(count, 200_000));
-
-    // Load a batch of targets. If fewer than requested, cycle by re-querying pages.
-    const { rows: pool, total } = await listTargets({ limit, offset: 0 });
-    if (!pool.length) {
-      log.error("No targets in database. Add some first.");
+    if(!this.progress.running)
       return;
-    }
-    const targets: Target[] = [];
-    while (targets.length < limit) {
-      targets.push(...pool.slice(0, Math.min(pool.length, limit - targets.length)));
+
+
+    this.cancelRequested = true;
+
+
+    if(this.pauseResolver){
+
+      this.pauseResolver();
+
+      this.pauseResolver = null;
+
     }
 
-    const scanId = await createScan(targets.length);
+
+    log.warn(
+      "Stopping scanner..."
+    );
+
+  }
+
+
+
+
+
+  async probe(
+    address:string,
+    timeout:number
+  ):Promise<number|null>{
+
+
+    const start =
+      performance.now();
+
+
+    const controller =
+      new AbortController();
+
+
+
+    const timer =
+      setTimeout(
+        ()=>controller.abort(),
+        timeout
+      );
+
+
+    try {
+
+
+      let url = address.trim();
+
+
+      if(
+        !url.startsWith("http")
+      ){
+
+        url =
+          "https://" + url;
+
+      }
+
+
+
+      await fetch(
+        url,
+        {
+          method:"GET",
+          mode:"no-cors",
+          cache:"no-store",
+          signal:
+            controller.signal
+        }
+      );
+
+
+
+      return (
+        performance.now() - start
+      );
+
+
+    }
+    catch{
+
+      return null;
+
+    }
+    finally{
+
+      clearTimeout(timer);
+
+    }
+
+  }
+
+
+
+
+
+  private async loadTargets(
+    count:number
+  ):Promise<Target[]>{
+
+
+    const result:Target[] = [];
+
+    const pageSize = 500;
+
+    let offset = 0;
+
+
+
+    while(
+      result.length < count
+    ){
+
+      const page =
+        await listTargets({
+          limit:pageSize,
+          offset
+        });
+
+
+
+      if(!page.rows.length)
+        break;
+
+
+
+      result.push(
+        ...page.rows
+      );
+
+
+      offset += pageSize;
+
+
+
+      if(
+        page.rows.length < pageSize
+      )
+        break;
+
+    }
+
+
+
+    return result.slice(
+      0,
+      count
+    );
+
+  }
+
+
+
+
+
+  async start(
+    count:number
+  ){
+
+
+    if(this.progress.running)
+      return;
+
+
+
+    const settings =
+      useSettings.getState();
+
+
+    const timeout =
+      settings.timeout;
+
+
+    const concurrency =
+      Math.min(
+        50,
+        Math.max(
+          1,
+          settings.concurrency
+        )
+      );
+
+
+
+    const targets =
+      await this.loadTargets(
+        count
+      );
+
+
+
+    if(!targets.length){
+
+      log.error(
+        "No targets found"
+      );
+
+      return;
+
+    }
+
+
+
+
+
+    const scanId =
+      await createScan(
+        targets.length
+      );
+
+
+
     this.cancelRequested = false;
+
     this.latencySum = 0;
+
     this.latencyCount = 0;
+
+
+
     this.progress = {
+
       scanId,
-      total: targets.length,
-      completed: 0,
-      online: 0,
-      offline: 0,
-      running: true,
-      paused: false,
-      startedAt: Date.now(),
-      speed: 0,
-      eta: 0,
+
+      total:
+        targets.length,
+
+      completed:0,
+
+      online:0,
+
+      offline:0,
+
+      running:true,
+
+      paused:false,
+
+      startedAt:
+        Date.now(),
+
+      speed:0,
+
+      eta:0
+
     };
-    log.info(`Scan #${scanId} started — ${targets.length} targets (pool ${total})`);
+
+
+
     this.emit();
 
-    const queue = [...targets];
-    const workers = Array.from({ length: Math.max(1, concurrency) }, () =>
-      this.worker(queue, timeout, scanId),
-    );
-    await Promise.all(workers);
 
-    const avg = this.latencyCount ? this.latencySum / this.latencyCount : null;
+
+    log.info(
+      `Scan ${scanId} started with ${targets.length} targets`
+    );
+
+
+
+    const queue =
+      [...targets];
+
+
+
+    const workers =
+      Array.from(
+        {
+          length:concurrency
+        },
+        ()=>
+          this.worker(
+            queue,
+            timeout,
+            scanId
+          )
+      );
+
+
+
+    await Promise.all(
+      workers
+    );
+
+
+
+    const avg =
+      this.latencyCount
+      ?
+      this.latencySum /
+      this.latencyCount
+      :
+      null;
+
+
+
     await finishScan(
       scanId,
       this.progress.online,
       this.progress.offline,
       avg,
-      this.cancelRequested,
+      this.cancelRequested
     );
-    this.progress.running = false;
+
+
+
+    this.progress.running =
+      false;
+
+
     this.emit();
+
+
     log.success(
-      `Scan #${scanId} ${this.cancelRequested ? "cancelled" : "completed"} — ${this.progress.online} online, ${this.progress.offline} offline`,
+      `Scan finished: ${this.progress.online} online / ${this.progress.offline} offline`
     );
+
+
   }
 
-  private async worker(queue: Target[], timeout: number, scanId: number) {
-    const batchUpdates: Array<{
-      id: number;
-      status: string;
-      latency: number | null;
-      ts: number;
-    }> = [];
-    while (queue.length && !this.cancelRequested) {
-      await this.awaitPause();
-      if (this.cancelRequested) break;
-      const t = queue.shift();
-      if (!t) break;
-      this.progress.currentTarget = t.name;
-      const latency = await this.probe(t.address, timeout);
-      const status = latency !== null ? "online" : "offline";
-      if (status === "online") {
+
+
+
+
+  private async worker(
+    queue:Target[],
+    timeout:number,
+    scanId:number
+  ){
+
+
+
+    const updates:any[] = [];
+
+
+
+    while(
+      queue.length &&
+      !this.cancelRequested
+    ){
+
+
+      await this.waitPause();
+
+
+
+      const target =
+        queue.shift();
+
+
+
+      if(!target)
+        break;
+
+
+
+      this.progress.currentTarget =
+        target.name;
+
+
+
+      const latency =
+        await this.probe(
+          target.address,
+          timeout
+        );
+
+
+
+      const online =
+        latency !== null;
+
+
+
+      const status =
+        online
+        ?
+        "online"
+        :
+        "offline";
+
+
+
+      if(online){
+
         this.progress.online++;
-        if (latency !== null) {
-          this.latencySum += latency;
-          this.latencyCount++;
-        }
-      } else {
+
+        this.latencySum += latency!;
+
+        this.latencyCount++;
+
+      }
+      else{
+
         this.progress.offline++;
+
       }
+
+
+
       this.progress.completed++;
-      batchUpdates.push({ id: t.id, status, latency, ts: Date.now() });
-      addScanSample(scanId, t.id, status, latency).catch(() => {});
-      if (batchUpdates.length >= 25) {
-        await updateStatusMany(batchUpdates.splice(0));
+
+
+
+      updates.push({
+
+        id:target.id,
+
+        status,
+
+        latency,
+
+        ts:Date.now()
+
+      });
+
+
+
+      await addScanSample(
+        scanId,
+        target.id,
+        status,
+        latency
+      );
+
+
+
+      if(
+        updates.length >= 50
+      ){
+
+        await updateStatusMany(
+          updates.splice(0)
+        );
+
       }
-      if (this.progress.completed % 5 === 0) this.emit();
+
+
+
+      this.emit();
+
+
     }
-    if (batchUpdates.length) await updateStatusMany(batchUpdates);
-    this.emit();
+
+
+
+    if(updates.length){
+
+      await updateStatusMany(
+        updates
+      );
+
+    }
+
+
   }
+
 }
 
-export const scanner = new ScannerEngine();
+
+export const scanner =
+  new ScannerEngine();
