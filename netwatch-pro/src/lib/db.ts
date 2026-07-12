@@ -1087,3 +1087,24 @@ export async function categories() {
     .filter(Boolean);
 
 }
+export async function getRecentResults(
+  limit = 200
+) {
+
+  const result = await getDb().query(
+    `
+    SELECT *
+    FROM targets
+    WHERE last_checked IS NOT NULL
+    ORDER BY last_checked DESC
+    LIMIT ?
+    `,
+    [
+      limit
+    ]
+  );
+
+
+  return (result.values as Target[]) ?? [];
+
+}
