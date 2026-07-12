@@ -1048,4 +1048,26 @@ export async function wipeAll(){
  
  );
 
-  }
+}
+
+
+export async function scanTrend(days = 14) {
+
+  const result = await getDb().query(
+    `
+    SELECT
+      started_at,
+      online,
+      offline,
+      avg_latency
+    FROM scans
+    ORDER BY started_at DESC
+    LIMIT ?
+    `,
+    [days]
+  );
+
+
+  return result.values ?? [];
+
+}
