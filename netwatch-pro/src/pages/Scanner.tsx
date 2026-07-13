@@ -249,31 +249,23 @@ export default function Scanner() {
 
             <Button
 
-  onClick={async () => {
+  onClick={() => {
 
-    console.log(
-      "START BUTTON CLICKED",
-      scanCount
-    );
+    alert("BUTTON OK");
 
-    try {
+    scanner.start(scanCount)
+      .then(() => {
 
-      await scanner.start(
-        scanCount
-      );
+        alert("SCAN FINISHED");
 
-      console.log(
-        "SCAN START RETURNED"
-      );
+      })
+      .catch((e) => {
 
-    } catch (e:any) {
+        alert(
+          "ERROR: " + e.message
+        );
 
-      console.error(
-        "Scanner start error:",
-        e
-      );
-
-    }
+      });
 
   }}
 
