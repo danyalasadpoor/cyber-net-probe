@@ -112,7 +112,15 @@ export async function initDatabase(): Promise<void> {
 
     await seedIfEmpty();
 
+const check =
+  await db.query(
+    "SELECT COUNT(*) as c FROM targets"
+  );
 
+console.log(
+  "TOTAL TARGETS:",
+  check.values?.[0]?.c
+);
 
   })();
 
