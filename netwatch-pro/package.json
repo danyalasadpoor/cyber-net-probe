@@ -1,15 +1,17 @@
 {
+{
   "name": "netwatch-pro",
   "private": true,
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
-  "build": "tsc -b && vite build",
-  "preview": "vite preview",
-  "cap:sync": "cap sync",
-  "cap:android": "cap open android",
-  "prepare:targets": "node scripts/prepare-targets.js"
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "cap:sync": "cap sync",
+    "cap:android": "cap open android",
+    "prepare:targets": "node scripts/prepare-targets.js",
+    "convert:domains": "node scripts/convert-domains.js"
   },
   "dependencies": {
     "@capacitor-community/sqlite": "^6.0.2",
