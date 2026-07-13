@@ -797,48 +797,42 @@ export async function toggleFavorite(
 
 
 export async function updateStatusMany(
- updates:Array<{
- id:number;
- status:string;
- latency:number|null;
- ts:number;
- }>
-):Promise<void>{
+  updates: Array<{
+    id: number;
+    status: string;
+    latency: number | null;
+    ts: number;
+  }>
+): Promise<void> {
+
+  if (!updates.length) return;
 
 
- if(!updates.length)
- return;
+  const statements = updates.map((u) => ({
+
+    statement: `
+      UPDATE targets
+      SET
+        status=?,
+        latency=?,
+        last_checked=?
+      WHERE id=?
+    `,
 
 
+    values: [
+      u.status,
+      u.latency,
+      u.ts,
+      u.id
+    ]
 
- const statements =
- updates.map(u=>({
-
- statement:
- 
- UPDATE targets
- SET
- status=?,
- latency=?,
- last_checked=?
- WHERE id=?
- ,
+  }));
 
 
- values:[
-  u.status,
-  u.latency,
-  u.ts,
-  u.id
- ]
-
- }));
-
-
-
- await getDb().executeSet(
-   statements
- );
+  await getDb().executeSet(
+    statements
+  );
 
 }
 
