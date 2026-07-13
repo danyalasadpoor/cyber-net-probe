@@ -250,10 +250,21 @@ export default function Scanner() {
             <Button
 
   onClick={async () => {
-    
+
+    console.log(
+      "START BUTTON CLICKED",
+      scanCount
+    );
+
     try {
 
-      await scanner.start(scanCount);
+      await scanner.start(
+        scanCount
+      );
+
+      console.log(
+        "SCAN START RETURNED"
+      );
 
     } catch (e:any) {
 
@@ -265,6 +276,12 @@ export default function Scanner() {
     }
 
   }}
+
+  disabled={
+    progress?.running
+  }
+
+>
 
 
   disabled={
