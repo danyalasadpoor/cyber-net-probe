@@ -289,8 +289,8 @@ async function seedIfEmpty() {
   if (!Array.isArray(targetList) || targetList.length === 0) {
 
     console.warn(
-      "target.json is empty. No targets imported."
-    );
+  "targets-source.json is empty. No targets imported."
+);
 
     return;
   }
