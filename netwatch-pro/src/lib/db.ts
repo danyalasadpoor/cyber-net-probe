@@ -229,11 +229,7 @@ export async function initDatabase(): Promise<void> {
 
 
     await db.open();
-await db.execute(`
-DELETE FROM targets;
-`);
 
-    
 await db.execute(
   SCHEMA
 );
@@ -241,10 +237,6 @@ await db.execute(
 console.log("SCHEMA EXECUTED");
 
 const tables = await db.query(`
-  SELECT name
-  FROM sqlite_master
-  WHERE type='table'
-`);
   SELECT name
   FROM sqlite_master
   WHERE type='table'
