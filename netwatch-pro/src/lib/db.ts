@@ -776,3 +776,275 @@ export async function updateStatusMany(
 
 
 }
+export async function createScan(
+  total:number
+):Promise<number>{
+
+ const r =
+ await getDb().run(
+ `
+ INSERT INTO scans
+ (
+ started_at,
+ total,
+ status
+ )
+ VALUES(?,?,?)
+ `,
+ [
+  Date.now(),
+  total,
+  "running"
+ ]
+ );
+
+ return r.changes?.lastId ?? 0;
+
+}
+
+
+
+export async function finishScan(
+ id:number,
+ online:number,
+ offline:number,
+ avgLatency:number|null,
+ cancelled=false
+):Promise<void>{
+
+ await getDb().run(
+ `
+ UPDATE scans
+ SET
+ finished_at=?,
+ online=?,
+ offline=?,
+ avg_latency=?,
+ status=?
+ WHERE id=?
+ `,
+ [
+  Date.now(),
+  online,
+  offline,
+  avgLatency,
+  cancelled ? "cancelled" : "completed",
+  id
+ ]
+ );
+
+}
+
+
+
+export async function addScanSample(
+ scanId:number,
+ targetId:number,
+ status:string,
+ latency:number|null
+):Promise<void>{
+
+ await getDb().run(
+ `
+ INSERT INTO scan_samples
+ (
+ scan_id,
+ target_id,
+ status,
+ latency,
+ ts
+ )
+ VALUES(?,?,?,?,?)
+ `,
+ [
+  scanId,
+  targetId,
+  status,
+  latency,
+  Date.now()
+ ]
+ );
+
+}
+
+
+
+export async function listScans(
+ limit=100
+):Promise<ScanRecord[]>{
+
+ const r =
+ await getDb().query(
+ `
+ SELECT *
+ FROM scans
+ ORDER BY started_at DESC
+ LIMIT ?
+ `,
+ [limit]
+ );
+
+ return (r.values as ScanRecord[]) ?? [];
+
+}
+
+
+
+export async function dashboardStats(){
+
+ const total =
+ await getDb().query(
+ "SELECT COUNT(*) as c FROM targets"
+ );
+
+ const online =
+ await getDb().query(
+ "SELECT COUNT(*) as c FROM targets WHERE status='online'"
+ );
+
+ const offline =
+ await getDb().query(
+ "SELECT COUNT(*) as c FROM targets WHERE status='offline'"
+ );
+
+
+ return {
+  total: total.values?.[0]?.c ?? 0,
+  online: online.values?.[0]?.c ?? 0,
+  offline: offline.values?.[0]?.c ?? 0
+ };
+
+}
+
+
+
+export async function scanTrend(days=14){
+
+ const r =
+ await getDb().query(
+ `
+ SELECT
+ started_at,
+ online,
+ offline,
+ avg_latency
+ FROM scans
+ ORDER BY started_at DESC
+ LIMIT ?
+ `,
+ [days]
+ );
+
+ return r.values ?? [];
+
+}
+
+
+
+export async function categories(){
+
+ const r =
+ await getDb().query(
+ `
+ SELECT DISTINCT category
+ FROM targets
+ ORDER BY category
+ `
+ );
+
+ return (r.values ?? [])
+ .map((x:any)=>x.category)
+ .filter(Boolean);
+
+}
+
+
+
+export async function categoryDistribution(){
+
+ const r =
+ await getDb().query(
+ `
+ SELECT
+ category,
+ COUNT(*) as count
+ FROM targets
+ GROUP BY category
+ `
+ );
+
+ return r.values ?? [];
+
+}
+
+
+
+export async function getRecentResults(
+ limit=200
+):Promise<Target[]>{
+
+ const r =
+ await getDb().query(
+ `
+ SELECT *
+ FROM targets
+ WHERE last_checked IS NOT NULL
+ ORDER BY last_checked DESC
+ LIMIT ?
+ `,
+ [limit]
+ );
+
+ return (r.values as Target[]) ?? [];
+
+}
+
+
+
+export async function exportAll(){
+
+ const targets =
+ await getDb().query(
+ "SELECT * FROM targets"
+ );
+
+
+ const scans =
+ await getDb().query(
+ "SELECT * FROM scans"
+ );
+
+
+ return {
+  targets: targets.values ?? [],
+  scans: scans.values ?? []
+ };
+
+}
+
+
+
+export async function wipeAll(){
+
+ await getDb().execute(
+ `
+ DELETE FROM scan_samples;
+ DELETE FROM scans;
+ DELETE FROM targets;
+ `
+ );
+
+}
+
+
+
+export async function deleteScan(
+ id:number
+){
+
+ await getDb().run(
+ "DELETE FROM scans WHERE id=?",
+ [id]
+ );
+
+}
