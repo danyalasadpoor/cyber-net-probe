@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "name": "Example",
+    "address": "https://example.com",
+    "category": "test",
+    "tags": "",
+    "notes": ""
+  }
+]
