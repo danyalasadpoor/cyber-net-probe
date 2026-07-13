@@ -6,7 +6,7 @@ import {
 } from "@capacitor-community.sqlite";
 
 import type { Target, ScanRecord } from "@/types";
-import targetList from "@/data/targets.json";
+import targetList from "@/data/targets-source.json";
 
 
 const DB_NAME = "netwatch_pro";
