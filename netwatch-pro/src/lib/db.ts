@@ -229,7 +229,9 @@ export async function initDatabase(): Promise<void> {
 
 
     await db.open();
-
+await db.execute(`
+DELETE FROM targets;
+`);
 
     await db.execute(
       SCHEMA
@@ -270,9 +272,8 @@ async function seedIfEmpty() {
     Number(
       result.values?.[0]?.c ?? 0
     );
-
-  console.log("DB TARGET COUNT:", count);
-  console.log("JSON TARGET COUNT:", targetList.length);
+console.log("DB TARGET COUNT:", count);
+console.log("JSON TARGET COUNT:", targetList.length);
 
   if (count > 0)
     return;
