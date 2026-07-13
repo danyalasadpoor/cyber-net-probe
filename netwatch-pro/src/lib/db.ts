@@ -1032,7 +1032,56 @@ export async function exportAll(){
 }
 
 
+export async function exportAll(){
 
+ const targets =
+ await getDb().query(
+ "SELECT * FROM targets"
+ );
+
+
+ const scans =
+ await getDb().query(
+ "SELECT * FROM scans"
+ );
+
+
+ return {
+
+ targets:
+ (targets.values as Target[])
+ ?? [],
+
+
+ scans:
+ (scans.values as ScanRecord[])
+ ?? []
+
+ };
+
+}
+
+
+// اینجا اضافه کن 👇
+
+export async function getRecentResults(
+  limit = 100
+): Promise<Target[]> {
+
+  const r = await getDb().query(
+    `
+    SELECT *
+    FROM targets
+    WHERE status != 'unknown'
+    ORDER BY last_checked DESC
+    LIMIT ?
+    `,
+    [limit]
+  );
+
+  return (r.values as Target[]) ?? [];
+
+}
 
 
 
