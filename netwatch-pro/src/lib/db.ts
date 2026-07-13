@@ -1120,15 +1120,15 @@ export async function getRecentResults(
 
 export async function wipeAll(){
 
- await getDb().execute(
- 
- DELETE FROM scan_samples;
+  await getDb().execute(
+    `
+    DELETE FROM scan_samples;
 
- DELETE FROM scans;
+    DELETE FROM scans;
 
- DELETE FROM targets;
- 
- );
+    DELETE FROM targets;
+    `
+  );
 
 }
 
