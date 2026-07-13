@@ -230,23 +230,6 @@ export async function initDatabase(): Promise<void> {
 
     await db.open();
 
-await db.execute(
-  SCHEMA
-);
-
-console.log("SCHEMA EXECUTED");
-
-const tables = await db.query(`
-  SELECT name
-  FROM sqlite_master
-  WHERE type='table'
-`);
-
-console.log(
-  "DATABASE TABLES:",
-  tables.values
-);
-
 await seedIfEmpty();
 
 const checkTargets = await db.query(
@@ -287,6 +270,125 @@ console.log("JSON TARGET COUNT:", targetList.length);
 
   if (count > 0)
     return;
+if (ready)
+  return ready;
+
+
+ready = (async () => {
+
+  await setupWeb()
+    .catch(err =>
+      console.warn(
+        "sqlite web setup:",
+        err
+      )
+    );
+
+
+  sqlite =
+    new SQLiteConnection(
+      CapacitorSQLite
+    );
+
+
+  const exists =
+    (
+      await sqlite.isConnection(
+        DB_NAME,
+        false
+      )
+    ).result;
+
+
+  db =
+    exists
+      ? await sqlite.retrieveConnection(
+          DB_NAME,
+          false
+        )
+      : await sqlite.createConnection(
+          DB_NAME,
+          false,
+          "no-encryption",
+          DB_VERSION,
+          false
+        );
+
+
+  await db.open();
+
+
+  await db.execute(
+    SCHEMA
+  );
+
+
+  console.log(
+    "SCHEMA EXECUTED"
+  );
+
+
+  await seedIfEmpty();
+
+
+  const checkTargets =
+    await db.query(
+      "SELECT COUNT(*) as c FROM targets"
+    );
+
+
+  console.log(
+    "DATABASE TARGET COUNT:",
+    checkTargets.values?.[0]?.c
+  );
+
+
+})();
+
+
+return ready;
+
+}
+
+
+
+
+
+async function seedIfEmpty() {
+
+  const result =
+    await getDb().query(
+      "SELECT COUNT(*) as c FROM targets"
+    );
+
+
+  const count =
+    Number(
+      result.values?.[0]?.c ?? 0
+    );
+
+
+  console.log(
+    "DB TARGET COUNT:",
+    count
+  );
+
+
+  console.log(
+    "JSON TARGET COUNT:",
+    targetList.length
+  );
+
+
+  if (count > 0) {
+
+    console.log(
+      "Targets already imported"
+    );
+
+    return;
+
+  }
 
 
 
@@ -304,7 +406,6 @@ console.log("JSON TARGET COUNT:", targetList.length);
   }
 
 
-
   const max =
     Math.min(
       targetList.length,
@@ -315,12 +416,12 @@ console.log("JSON TARGET COUNT:", targetList.length);
   const batchSize = 500;
 
 
-
-  for(
+  for (
     let i = 0;
     i < max;
     i += batchSize
-  ){
+  ) {
+
 
     const batch =
       targetList.slice(
@@ -360,7 +461,15 @@ console.log("JSON TARGET COUNT:", targetList.length);
       }))
     );
 
+
   }
+
+
+  console.log(
+    `Imported ${max} targets`
+  );
+
+    }
 
 
 
