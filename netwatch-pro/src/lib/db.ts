@@ -496,34 +496,30 @@ export async function listTargets(
   total: number;
 }> {
 
-
-  const where:string[] = [];
-  const args:any[] = [];
-
+  const where: string[] = [];
+  const args: any[] = [];
 
 
-  if(q.search){
+  if (q.search) {
 
     where.push(
       "(name LIKE ? OR address LIKE ? OR tags LIKE ?)"
     );
 
-    const s = %${q.search}%;
+    const s = `%${q.search}%`;
 
     args.push(
       s,
       s,
       s
     );
-
   }
 
 
-
-  if(
+  if (
     q.category &&
     q.category !== "all"
-  ){
+  ) {
 
     where.push(
       "category = ?"
@@ -532,15 +528,13 @@ export async function listTargets(
     args.push(
       q.category
     );
-
   }
 
 
-
-  if(
+  if (
     q.status &&
     q.status !== "all"
-  ){
+  ) {
 
     where.push(
       "status = ?"
@@ -549,38 +543,33 @@ export async function listTargets(
     args.push(
       q.status
     );
-
   }
 
 
-
-  if(q.favoriteOnly){
+  if (q.favoriteOnly) {
 
     where.push(
       "favorite = 1"
     );
-
   }
-
 
 
   const condition =
     where.length
-    ? WHERE ${where.join(" AND ")}
-    : "";
+      ? `WHERE ${where.join(" AND ")}`
+      : "";
 
 
 
   const totalResult =
     await getDb().query(
-      
+      `
       SELECT COUNT(*) as c
       FROM targets
       ${condition}
-      ,
+      `,
       args
     );
-
 
 
   const total =
@@ -599,13 +588,13 @@ export async function listTargets(
 
   const result =
     await getDb().query(
-      
+      `
       SELECT *
       FROM targets
       ${condition}
       ORDER BY favorite DESC, name ASC
       LIMIT ? OFFSET ?
-      ,
+      `,
       [
         ...args,
         limit,
@@ -614,16 +603,12 @@ export async function listTargets(
     );
 
 
-
   return {
-
     rows:
-      (result.values as Target[])
-      ?? [],
+      (result.values as Target[]) ?? [],
 
     total:
       total as number
-
   };
 
 }
@@ -632,68 +617,63 @@ export async function listTargets(
 
 
 
-
 export async function getTarget(
-  id:number
-):Promise<Target|null>{
+  id: number
+): Promise<Target | null> {
+
+  const r =
+    await getDb().query(
+      "SELECT * FROM targets WHERE id=?",
+      [id]
+    );
 
 
- const r =
- await getDb().query(
-   "SELECT * FROM targets WHERE id=?",
-   [id]
- );
-
-
- return (
-   r.values?.[0] as Target
- )
- ?? null;
-
+  return (
+    r.values?.[0] as Target
+  ) ?? null;
 
 }
-
 
 
 
 
 
 export async function createTarget(
- t:Pick<
- Target,
- "name"|
- "address"|
- "category"|
- "tags"|
- "notes"
- >
-):Promise<number>{
+  t: Pick<
+    Target,
+    "name" |
+    "address" |
+    "category" |
+    "tags" |
+    "notes"
+  >
+): Promise<number> {
 
 
- const r =
- await getDb().run(
- 
- INSERT INTO targets
- (
- name,
- address,
- category,
- tags,
- notes
- )
- VALUES(?,?,?,?,?)
- ,
- [
-  t.name,
-  t.address,
-  t.category || "general",
-  t.tags || "",
-  t.notes || ""
- ]
- );
+  const r =
+    await getDb().run(
+      `
+      INSERT INTO targets
+      (
+        name,
+        address,
+        category,
+        tags,
+        notes
+      )
+      VALUES(?,?,?,?,?)
+      `,
+      [
+        t.name,
+        t.address,
+        t.category || "general",
+        t.tags || "",
+        t.notes || ""
+      ]
+    );
 
 
- return r.changes?.lastId ?? 0;
+  return r.changes?.lastId ?? 0;
 
 }
 
@@ -701,49 +681,88 @@ export async function createTarget(
 
 
 
-
 export async function updateTarget(
- id:number,
- patch:Partial<Target>
-):Promise<void>{
+  id: number,
+  patch: Partial<Target>
+): Promise<void> {
 
 
- const keys =
- Object.keys(patch);
+  const keys =
+    Object.keys(patch);
 
 
-
- if(!keys.length)
- return;
-
-
-
- const set =
- keys.map(
- k=>${k}=?
- ).join(",");
+  if (!keys.length)
+    return;
 
 
 
- const values =
- keys.map(
- k=>(patch as any)[k]
- );
+  const set =
+    keys
+      .map(
+        k => `${k}=?`
+      )
+      .join(",");
 
 
 
- await getDb().run(
- 
- UPDATE targets
- SET ${set}
- WHERE id=?
- ,
- [
-  ...values,
-  id
- ]
- );
+  const values =
+    keys.map(
+      k => (patch as any)[k]
+    );
 
+
+
+  await getDb().run(
+    `
+    UPDATE targets
+    SET ${set}
+    WHERE id=?
+    `,
+    [
+      ...values,
+      id
+    ]
+  );
+
+}
+
+
+
+
+
+export async function deleteTarget(
+  id: number
+): Promise<void> {
+
+
+  await getDb().run(
+    "DELETE FROM targets WHERE id=?",
+    [id]
+  );
+
+}
+
+
+
+
+
+export async function toggleFavorite(
+  id: number
+): Promise<void> {
+
+
+  await getDb().run(
+    `
+    UPDATE targets
+    SET favorite =
+      CASE favorite
+        WHEN 1 THEN 0
+        ELSE 1
+      END
+    WHERE id=?
+    `,
+    [id]
+  );
 
 }
 
