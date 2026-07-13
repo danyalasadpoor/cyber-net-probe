@@ -237,12 +237,25 @@ DELETE FROM targets;
     console.log("SCHEMA EXECUTED");
 
 const tables = await db.query(`
-  SELECT name FROM sqlite_master WHERE type='table'
+await db.execute(
+  SCHEMA
+);
+
+console.log("SCHEMA EXECUTED");
+
+const tables = await db.query(`
+  SELECT name
+  FROM sqlite_master
+  WHERE type='table'
 `);
 
-console.log("DATABASE TABLES:", tables.values);
-    
-    await seedIfEmpty();
+console.log(
+  "DATABASE TABLES:",
+  tables.values
+);
+
+await seedIfEmpty();
+
 const checkTargets = await db.query(
   "SELECT COUNT(*) as c FROM targets"
 );
