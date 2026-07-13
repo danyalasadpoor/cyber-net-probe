@@ -845,107 +845,103 @@ export async function updateStatusMany(
 
 
 export async function createScan(
- total:number
-):Promise<number>{
+  total: number
+): Promise<number> {
+
+  const r =
+    await getDb().run(
+      `
+      INSERT INTO scans
+      (
+        started_at,
+        total,
+        status
+      )
+      VALUES
+      (?, ?, 'running')
+      `,
+      [
+        Date.now(),
+        total
+      ]
+    );
 
 
- const r =
- await getDb().run(
- 
- INSERT INTO scans
- (
- started_at,
- total,
- status
- )
- VALUES
- (? , ?, 'running')
- ,
- [
-  Date.now(),
-  total
- ]
- );
-
-
- return r.changes?.lastId ?? 0;
+  return r.changes?.lastId ?? 0;
 
 }
-
 
 
 
 
 
 export async function finishScan(
- id:number,
- online:number,
- offline:number,
- avgLatency:number|null,
- cancelled=false
-):Promise<void>{
+  id: number,
+  online: number,
+  offline: number,
+  avgLatency: number | null,
+  cancelled = false
+): Promise<void> {
 
 
- await getDb().run(
- 
- UPDATE scans
- SET
- finished_at=?,
- online=?,
- offline=?,
- avg_latency=?,
- status=?
- WHERE id=?
- ,
- [
- Date.now(),
- online,
- offline,
- avgLatency,
- cancelled
- ? "cancelled"
- : "completed",
- id
- ]
- );
-
+  await getDb().run(
+    `
+    UPDATE scans
+    SET
+      finished_at=?,
+      online=?,
+      offline=?,
+      avg_latency=?,
+      status=?
+    WHERE id=?
+    `,
+    [
+      Date.now(),
+      online,
+      offline,
+      avgLatency,
+      cancelled
+        ? "cancelled"
+        : "completed",
+      id
+    ]
+  );
 
 }
-
 
 
 
 
 
 export async function addScanSample(
- scanId:number,
- targetId:number,
- status:string,
- latency:number|null
-):Promise<void>{
+  scanId: number,
+  targetId: number,
+  status: string,
+  latency: number | null
+): Promise<void> {
 
-await getDb().run(
- 
- INSERT INTO scan_samples
- (
- scan_id,
- target_id,
- status,
- latency,
- ts
- )
- VALUES
- (?,?,?,?,?)
- ,
- [
-  scanId,
-  targetId,
-  status,
-  latency,
-  Date.now()
- ]
- );
 
+  await getDb().run(
+    `
+    INSERT INTO scan_samples
+    (
+      scan_id,
+      target_id,
+      status,
+      latency,
+      ts
+    )
+    VALUES
+    (?, ?, ?, ?, ?)
+    `,
+    [
+      scanId,
+      targetId,
+      status,
+      latency,
+      Date.now()
+    ]
+  );
 
 }
 
@@ -953,29 +949,28 @@ await getDb().run(
 
 
 
-
 export async function listScans(
- limit=100
-):Promise<ScanRecord[]>{
+  limit = 100
+): Promise<ScanRecord[]> {
 
 
- const r =
- await getDb().query(
- 
- SELECT *
- FROM scans
- ORDER BY started_at DESC
- LIMIT ?
- ,
- [limit]
- );
+  const r =
+    await getDb().query(
+      `
+      SELECT *
+      FROM scans
+      ORDER BY started_at DESC
+      LIMIT ?
+      `,
+      [
+        limit
+      ]
+    );
 
 
- return (
- r.values as ScanRecord[]
- )
- ?? [];
-
+  return (
+    r.values as ScanRecord[]
+  ) ?? [];
 
 }
 
