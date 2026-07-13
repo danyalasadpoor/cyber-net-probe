@@ -271,6 +271,8 @@ async function seedIfEmpty() {
       result.values?.[0]?.c ?? 0
     );
 
+  console.log("DB TARGET COUNT:", count);
+  console.log("JSON TARGET COUNT:", targetList.length);
 
   if (count > 0)
     return;
