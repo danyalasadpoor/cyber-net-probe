@@ -355,8 +355,8 @@ async function seedIfEmpty() {
 
 
   console.log(
-    Imported ${limit} targets
-  );
+    `Imported ${limit} targets`
+);
 
 }
 
