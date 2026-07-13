@@ -282,15 +282,6 @@ export default function Scanner() {
   }
 
 >
-
-
-  disabled={
-    progress?.running
-  }
-
-
->
-
               <Play className="w-4 h-4" />
 
               Start scan
