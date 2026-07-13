@@ -249,19 +249,30 @@ export default function Scanner() {
 
             <Button
 
-              onClick={() =>
-                scanner.start(
-                  scanCount
-                )
-              }
+  onClick={async () => {
+    
+    try {
+
+      await scanner.start(scanCount);
+
+    } catch (e:any) {
+
+      console.error(
+        "Scanner start error:",
+        e
+      );
+
+    }
+
+  }}
 
 
-              disabled={
-                progress?.running
-              }
+  disabled={
+    progress?.running
+  }
 
 
-            >
+>
 
               <Play className="w-4 h-4" />
 
