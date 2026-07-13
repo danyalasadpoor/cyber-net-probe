@@ -444,7 +444,7 @@ export async function bulkInsertTargets(
   const statements =
     items.map(t => ({
 
-      statement:
+      statement:`
       
       INSERT INTO targets
       (
@@ -468,7 +468,7 @@ export async function bulkInsertTargets(
         t.notes || ""
       ]
 
-    }));
+    }));`
 
 
 
