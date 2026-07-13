@@ -1,11 +1,13 @@
 import { Capacitor } from "@capacitor/core";
+
 import {
   CapacitorSQLite,
   SQLiteConnection,
   SQLiteDBConnection,
-} from "@capacitor-community.sqlite";
+} from "@capacitor-community/sqlite";
 
 import type { Target, ScanRecord } from "@/types";
+
 import targetList from "@/data/targets-source.json";
 
 
@@ -21,19 +23,24 @@ let ready: Promise<void> | null = null;
 
 async function setupWeb() {
 
-  const platform = Capacitor.getPlatform();
+  if (Capacitor.getPlatform() !== "web")
+    return;
 
-  if (platform !== "web") return;
 
+  const loader =
+    await import("jeep-sqlite/loader");
 
-  const loader = await import("jeep-sqlite/loader");
 
   loader.defineCustomElements(window);
 
 
-  const jeepEl = document.createElement("jeep-sqlite");
+  const jeepEl =
+    document.createElement("jeep-sqlite");
 
-  document.body.appendChild(jeepEl);
+
+  document.body.appendChild(
+    jeepEl
+  );
 
 
   await customElements.whenDefined(
@@ -48,149 +55,35 @@ async function setupWeb() {
 
 
 
-export async function initDatabase(): Promise<void> {
-
-
-  if (ready) return ready;
-
-
-
-  ready = (async()=>{
-
-
-    await setupWeb()
-      .catch(e =>
-        console.warn(
-          "web sqlite setup:",
-          e
-        )
-      );
-
-
-
-    sqlite = new SQLiteConnection(
-      CapacitorSQLite
-    );
-
-
-
-    const isConn =
-      (
-        await sqlite.isConnection(
-          DB_NAME,
-          false
-        )
-      ).result;
-
-
-
-    db = isConn
-
-      ? await sqlite.retrieveConnection(
-          DB_NAME,
-          false
-        )
-
-      : await sqlite.createConnection(
-          DB_NAME,
-          false,
-          "no-encryption",
-          DB_VERSION,
-          false
-        );
-
-
-
-    await db.open();
-
-
-    await db.execute(
-      SCHEMA
-    );
-
-
-
-    await seedIfEmpty();
-
-const check =
-  await db.query(
-    "SELECT COUNT(*) as c FROM targets"
-  );
-
-console.log(
-  "TOTAL TARGETS:",
-  check.values?.[0]?.c
-);
-
-  })();
-
-
-
-  return ready;
-
-}
-
-
-
-
-
-
 const SCHEMA = `
+
 CREATE TABLE IF NOT EXISTS targets (
 
- id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
 
- name TEXT NOT NULL,
+  name TEXT NOT NULL,
 
- address TEXT NOT NULL,
+  address TEXT NOT NULL,
 
- category TEXT NOT NULL DEFAULT 'general',
+  category TEXT NOT NULL DEFAULT 'general',
 
- tags TEXT NOT NULL DEFAULT '',
+  tags TEXT NOT NULL DEFAULT '',
 
- notes TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
 
- favorite INTEGER NOT NULL DEFAULT 0,
+  favorite INTEGER NOT NULL DEFAULT 0,
 
- status TEXT NOT NULL DEFAULT 'unknown',
+  status TEXT NOT NULL DEFAULT 'unknown',
 
- latency REAL,
+  latency REAL,
 
- availability REAL NOT NULL DEFAULT 0,
+  availability REAL NOT NULL DEFAULT 0,
 
- last_checked INTEGER,
+  last_checked INTEGER,
 
- created_at INTEGER NOT NULL DEFAULT
- (strftime('%s','now')*1000)
-
-);
-
-
-CREATE INDEX IF NOT EXISTS idx_targets_status
-ON targets(status);
-
-
-CREATE TABLE IF NOT EXISTS scans (
-
- id INTEGER PRIMARY KEY AUTOINCREMENT,
-
- scan_id TEXT NOT NULL,
-
- target_id INTEGER,
-
- status TEXT NOT NULL DEFAULT 'unknown',
-
- latency REAL,
-
- created_at INTEGER NOT NULL DEFAULT
- (strftime('%s','now')*1000)
+  created_at INTEGER NOT NULL
 
 );
-
-
-CREATE INDEX IF NOT EXISTS idx_scans_scan_id
-ON scans(scan_id);
-`;
 
 
 
@@ -209,11 +102,6 @@ ON targets(favorite);
 
 
 
-CREATE INDEX IF NOT EXISTS idx_targets_name
-ON targets(name);
-
-
-
 CREATE INDEX IF NOT EXISTS idx_targets_last
 ON targets(last_checked);
 
@@ -221,21 +109,21 @@ ON targets(last_checked);
 
 CREATE TABLE IF NOT EXISTS scans (
 
- id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
 
- started_at INTEGER NOT NULL,
+  started_at INTEGER NOT NULL,
 
- finished_at INTEGER,
+  finished_at INTEGER,
 
- total INTEGER NOT NULL DEFAULT 0,
+  total INTEGER NOT NULL DEFAULT 0,
 
- online INTEGER NOT NULL DEFAULT 0,
+  online INTEGER NOT NULL DEFAULT 0,
 
- offline INTEGER NOT NULL DEFAULT 0,
+  offline INTEGER NOT NULL DEFAULT 0,
 
- avg_latency REAL,
+  avg_latency REAL,
 
- status TEXT NOT NULL DEFAULT 'running'
+  status TEXT NOT NULL DEFAULT 'running'
 
 );
 
@@ -248,21 +136,21 @@ ON scans(started_at);
 
 CREATE TABLE IF NOT EXISTS scan_samples (
 
- id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
 
- scan_id INTEGER NOT NULL,
+  scan_id INTEGER NOT NULL,
 
- target_id INTEGER NOT NULL,
+  target_id INTEGER NOT NULL,
 
- status TEXT NOT NULL,
+  status TEXT NOT NULL,
 
- latency REAL,
+  latency REAL,
 
- ts INTEGER NOT NULL,
+  ts INTEGER NOT NULL,
 
- FOREIGN KEY(scan_id)
- REFERENCES scans(id)
- ON DELETE CASCADE
+  FOREIGN KEY(scan_id)
+  REFERENCES scans(id)
+  ON DELETE CASCADE
 
 );
 
@@ -276,129 +164,195 @@ ON scan_samples(scan_id);
 CREATE INDEX IF NOT EXISTS idx_samples_target
 ON scan_samples(target_id);
 
+`;
 
 
-;`
 
 
 
 function getDb(): SQLiteDBConnection {
 
- if(!db)
-   throw new Error(
-     "Database not initialized"
-   );
+  if (!db)
+    throw new Error(
+      "Database not initialized"
+    );
 
 
- return db;
+  return db;
+
+}
+export async function initDatabase(): Promise<void> {
+
+  if (ready)
+    return ready;
+
+
+  ready = (async () => {
+
+    await setupWeb()
+      .catch(err =>
+        console.warn(
+          "sqlite web setup:",
+          err
+        )
+      );
+
+
+    sqlite =
+      new SQLiteConnection(
+        CapacitorSQLite
+      );
+
+
+    const exists =
+      (
+        await sqlite.isConnection(
+          DB_NAME,
+          false
+        )
+      ).result;
+
+
+    db =
+      exists
+        ? await sqlite.retrieveConnection(
+            DB_NAME,
+            false
+          )
+        : await sqlite.createConnection(
+            DB_NAME,
+            false,
+            "no-encryption",
+            DB_VERSION,
+            false
+          );
+
+
+    await db.open();
+
+
+    await db.execute(
+      SCHEMA
+    );
+
+
+    await seedIfEmpty();
+
+
+  })();
+
+
+  return ready;
 
 }
 
+
+
+
+
+
 async function seedIfEmpty() {
 
-  const res = await getDb().query(
-    "SELECT COUNT(*) as c FROM targets"
-  );
+  const result =
+    await getDb().query(
+      "SELECT COUNT(*) as c FROM targets"
+    );
 
 
   const count =
-    (res.values?.[0]?.c as number) ?? 0;
+    Number(
+      result.values?.[0]?.c ?? 0
+    );
 
 
-  if (count > 0) {
+  if (count > 0)
     return;
-  }
 
 
 
-  if (!Array.isArray(targetList) || targetList.length === 0) {
+  if (
+    !Array.isArray(targetList) ||
+    targetList.length === 0
+  ) {
 
     console.warn(
-  "targets-source.json is empty. No targets imported."
-);
+      "targets-source.json empty"
+    );
 
     return;
+
   }
 
 
 
-  const limit = Math.min(
-    targetList.length,
-    20000
-  );
-
+  const max =
+    Math.min(
+      targetList.length,
+      20000
+    );
 
 
   const batchSize = 500;
 
 
 
-  for (
+  for(
     let i = 0;
-    i < limit;
+    i < max;
     i += batchSize
-  ) {
+  ){
 
-
-    const batch = targetList.slice(
-      i,
-      i + batchSize
-    );
-
-
-    const items = batch.map((t:any)=>({
-
-      name:
-        t.name ||
-        t.address ||
-        "Unknown",
-
-
-      address:
-        t.address ||
-        "",
-
-
-      category:
-        t.category ||
-        "general",
-
-
-      tags:
-        t.tags ||
-        "",
-
-
-      notes:
-        t.notes ||
-        ""
-
-    }));
-
+    const batch =
+      targetList.slice(
+        i,
+        i + batchSize
+      );
 
 
     await bulkInsertTargets(
-      items
+      batch.map((t:any)=>({
+
+        name:
+          t.name ||
+          t.address ||
+          "Unknown",
+
+
+        address:
+          t.address ||
+          "",
+
+
+        category:
+          t.category ||
+          "general",
+
+
+        tags:
+          t.tags ||
+          "",
+
+
+        notes:
+          t.notes ||
+          ""
+
+      }))
     );
-
-
 
   }
 
 
 
   console.log(
-    `Imported ${limit} targets`
-);
+    `Imported ${max} targets`
+  );
 
 }
 
 
 
 
-
-
-// ---------- Targets ----------
 
 
 export interface TargetsQuery {
@@ -422,7 +376,9 @@ export interface TargetsQuery {
 
 
 
+
 export async function bulkInsertTargets(
+
   items: Array<
     Pick<
       Target,
@@ -433,6 +389,7 @@ export async function bulkInsertTargets(
       "notes"
     >
   >
+
 ): Promise<number> {
 
 
@@ -444,23 +401,20 @@ export async function bulkInsertTargets(
   const statements =
     items.map(t => ({
 
-      statement:`
-      
-      INSERT INTO targets
-      (
-        name,
-        address,
-        category,
-        tags,
-        notes
-      )
-      VALUES
-      (?,?,?,?,?)
-      ,
+      statement: `
+        INSERT INTO targets
+        (
+          name,
+          address,
+          category,
+          tags,
+          notes
+        )
+        VALUES
+        (?,?,?,?,?)
+      `,
 
-
-      values:
-      [
+      values:[
         t.name,
         t.address,
         t.category || "general",
@@ -468,7 +422,7 @@ export async function bulkInsertTargets(
         t.notes || ""
       ]
 
-    }));`
+    }));
 
 
 
@@ -478,16 +432,12 @@ export async function bulkInsertTargets(
     );
 
 
-
   return (
     result.changes?.changes ??
     items.length
   );
 
 }
-
-// ---------- Targets ----------
-
 
 export async function listTargets(
   q: TargetsQuery = {}
@@ -496,11 +446,13 @@ export async function listTargets(
   total: number;
 }> {
 
-  const where: string[] = [];
-  const args: any[] = [];
+
+  const where:string[] = [];
+  const args:any[] = [];
 
 
-  if (q.search) {
+
+  if(q.search){
 
     where.push(
       "(name LIKE ? OR address LIKE ? OR tags LIKE ?)"
@@ -513,51 +465,60 @@ export async function listTargets(
       s,
       s
     );
+
   }
 
 
-  if (
+
+  if(
     q.category &&
     q.category !== "all"
-  ) {
+  ){
 
     where.push(
-      "category = ?"
+      "category=?"
     );
 
     args.push(
       q.category
     );
+
   }
 
 
-  if (
+
+  if(
     q.status &&
     q.status !== "all"
-  ) {
+  ){
 
     where.push(
-      "status = ?"
+      "status=?"
     );
 
     args.push(
       q.status
     );
+
   }
 
 
-  if (q.favoriteOnly) {
+
+  if(q.favoriteOnly){
 
     where.push(
-      "favorite = 1"
+      "favorite=1"
     );
+
   }
+
 
 
   const condition =
     where.length
       ? `WHERE ${where.join(" AND ")}`
       : "";
+
 
 
 
@@ -572,17 +533,9 @@ export async function listTargets(
     );
 
 
+
   const total =
     totalResult.values?.[0]?.c ?? 0;
-
-
-
-  const limit =
-    q.limit ?? 50;
-
-
-  const offset =
-    q.offset ?? 0;
 
 
 
@@ -597,18 +550,21 @@ export async function listTargets(
       `,
       [
         ...args,
-        limit,
-        offset
+        q.limit ?? 50,
+        q.offset ?? 0
       ]
     );
 
 
+
   return {
+
     rows:
       (result.values as Target[]) ?? [],
 
     total:
-      total as number
+      Number(total)
+
   };
 
 }
@@ -617,485 +573,206 @@ export async function listTargets(
 
 
 
+
+
 export async function getTarget(
-  id: number
-): Promise<Target | null> {
-
-  const r =
-    await getDb().query(
-      "SELECT * FROM targets WHERE id=?",
-      [id]
-    );
+ id:number
+):Promise<Target|null>{
 
 
-  return (
-    r.values?.[0] as Target
-  ) ?? null;
+ const result =
+ await getDb().query(
+  "SELECT * FROM targets WHERE id=?",
+  [id]
+ );
+
+
+ return (
+   result.values?.[0] as Target
+ ) ?? null;
+
 
 }
+
+
 
 
 
 
 
 export async function createTarget(
-  t: Pick<
-    Target,
-    "name" |
-    "address" |
-    "category" |
-    "tags" |
-    "notes"
-  >
-): Promise<number> {
+ t:Pick<
+ Target,
+ "name" |
+ "address" |
+ "category" |
+ "tags" |
+ "notes"
+ >
+):Promise<number>{
 
 
-  const r =
-    await getDb().run(
-      `
-      INSERT INTO targets
-      (
-        name,
-        address,
-        category,
-        tags,
-        notes
-      )
-      VALUES(?,?,?,?,?)
-      `,
-      [
-        t.name,
-        t.address,
-        t.category || "general",
-        t.tags || "",
-        t.notes || ""
-      ]
-    );
+ const result =
+ await getDb().run(
+ `
+ INSERT INTO targets
+ (
+ name,
+ address,
+ category,
+ tags,
+ notes,
+ created_at
+ )
+ VALUES(?,?,?,?,?,?)
+ `,
+ [
+  t.name,
+  t.address,
+  t.category || "general",
+  t.tags || "",
+  t.notes || "",
+  Date.now()
+ ]
+ );
 
 
-  return r.changes?.lastId ?? 0;
+ return result.changes?.lastId ?? 0;
 
 }
+
+
 
 
 
 
 
 export async function updateTarget(
-  id: number,
-  patch: Partial<Target>
-): Promise<void> {
+ id:number,
+ patch:Partial<Target>
+):Promise<void>{
 
 
-  const keys =
-    Object.keys(patch);
-
-
-  if (!keys.length)
-    return;
+ const keys =
+ Object.keys(patch);
 
 
 
-  const set =
-    keys
-      .map(
-        k => `${k}=?`
-      )
-      .join(",");
+ if(!keys.length)
+ return;
 
 
 
-  const values =
-    keys.map(
-      k => (patch as any)[k]
-    );
+ const set =
+ keys
+ .map(
+  k=>`${k}=?`
+ )
+ .join(",");
 
 
 
-  await getDb().run(
-    `
-    UPDATE targets
-    SET ${set}
-    WHERE id=?
-    `,
-    [
-      ...values,
-      id
-    ]
-  );
+ await getDb().run(
+ `
+ UPDATE targets
+ SET ${set}
+ WHERE id=?
+ `,
+ [
+  ...keys.map(
+   k=>(patch as any)[k]
+  ),
+  id
+ ]
+ );
+
 
 }
+
+
 
 
 
 
 
 export async function deleteTarget(
-  id: number
-): Promise<void> {
+ id:number
+):Promise<void>{
 
-
-  await getDb().run(
-    "DELETE FROM targets WHERE id=?",
-    [id]
-  );
+ await getDb().run(
+  "DELETE FROM targets WHERE id=?",
+  [id]
+ );
 
 }
+
+
+
+
 
 
 
 export async function toggleFavorite(
-  id: number
-): Promise<void> {
+ id:number
+):Promise<void>{
 
-
-  await getDb().run(
-    `
-    UPDATE targets
-    SET favorite =
-      CASE favorite
-        WHEN 1 THEN 0
-        ELSE 1
-      END
-    WHERE id=?
-    `,
-    [id]
-  );
+ await getDb().run(
+ `
+ UPDATE targets
+ SET favorite =
+ CASE favorite
+ WHEN 1 THEN 0
+ ELSE 1
+ END
+ WHERE id=?
+ `,
+ [id]
+ );
 
 }
+
+
+
+
+
 
 
 export async function updateStatusMany(
-  updates: Array<{
-    id: number;
-    status: string;
-    latency: number | null;
-    ts: number;
-  }>
-): Promise<void> {
-
-  if (!updates.length) return;
+ updates:Array<{
+ id:number;
+ status:string;
+ latency:number|null;
+ ts:number;
+ }>
+):Promise<void>{
 
 
-  const statements = updates.map((u) => ({
-
-    statement: `
-      UPDATE targets
-      SET
-        status=?,
-        latency=?,
-        last_checked=?
-      WHERE id=?
-    `,
-
-
-    values: [
-      u.status,
-      u.latency,
-      u.ts,
-      u.id
-    ]
-
-  }));
-
-
-  await getDb().executeSet(
-    statements
-  );
-
-}
+ if(!updates.length)
+ return;
 
 
 
+ await getDb().executeSet(
+ updates.map(u=>({
 
+ statement:`
+ UPDATE targets
+ SET
+ status=?,
+ latency=?,
+ last_checked=?
+ WHERE id=?
+ `,
 
+ values:[
+  u.status,
+  u.latency,
+  u.ts,
+  u.id
+ ]
 
-// ---------- Scans ----------
-
-
-export async function createScan(
-  total: number
-): Promise<number> {
-
-  const r =
-    await getDb().run(
-      `
-      INSERT INTO scans
-      (
-        started_at,
-        total,
-        status
-      )
-      VALUES
-      (?, ?, 'running')
-      `,
-      [
-        Date.now(),
-        total
-      ]
-    );
-
-
-  return r.changes?.lastId ?? 0;
-
-}
-
-
-
-
-
-export async function finishScan(
-  id: number,
-  online: number,
-  offline: number,
-  avgLatency: number | null,
-  cancelled = false
-): Promise<void> {
-
-
-  await getDb().run(
-    `
-    UPDATE scans
-    SET
-      finished_at=?,
-      online=?,
-      offline=?,
-      avg_latency=?,
-      status=?
-    WHERE id=?
-    `,
-    [
-      Date.now(),
-      online,
-      offline,
-      avgLatency,
-      cancelled
-        ? "cancelled"
-        : "completed",
-      id
-    ]
-  );
-
-}
-
-
-
-
-
-export async function addScanSample(
-  scanId: number,
-  targetId: number,
-  status: string,
-  latency: number | null
-): Promise<void> {
-
-
-  await getDb().run(
-    `
-    INSERT INTO scan_samples
-    (
-      scan_id,
-      target_id,
-      status,
-      latency,
-      ts
-    )
-    VALUES
-    (?, ?, ?, ?, ?)
-    `,
-    [
-      scanId,
-      targetId,
-      status,
-      latency,
-      Date.now()
-    ]
-  );
-
-}
-
-
-
-
-
-export async function listScans(
-  limit = 100
-): Promise<ScanRecord[]> {
-
-
-  const r =
-    await getDb().query(
-      `
-      SELECT *
-      FROM scans
-      ORDER BY started_at DESC
-      LIMIT ?
-      `,
-      [
-        limit
-      ]
-    );
-
-
-  return (
-    r.values as ScanRecord[]
-  ) ?? [];
-
-}
-
-
-
-
-
-
-export async function dashboardStats(){
-
-
- const total =
- await getDb().query(
- "SELECT COUNT(*) as c FROM targets"
+ }))
  );
 
-
- const online =
- await getDb().query(
- "SELECT COUNT(*) as c FROM targets WHERE status='online'"
- );
-
-
- const offline =
- await getDb().query(
- "SELECT COUNT(*) as c FROM targets WHERE status='offline'"
- );
-
-
- return {
-
- total:
- total.values?.[0]?.c ?? 0,
-
- online:
- online.values?.[0]?.c ?? 0,
-
- offline:
- offline.values?.[0]?.c ?? 0
-
- };
-
-
-}
-
-
-
-
-
-
-export async function exportAll(){
-
-
- const targets =
- await getDb().query(
- "SELECT * FROM targets"
- );
-
-
- const scans =
- await getDb().query(
- "SELECT * FROM scans"
- );
-
-
-
- return {
-
- targets:
- (targets.values as Target[])
- ?? [],
-
-
- scans:
- (scans.values as ScanRecord[])
- ?? []
-
- };
-
-
-}
-
-
-
-// اینجا اضافه کن 👇
-
-
-export async function wipeAll(){
-
-  await getDb().execute(
-    `
-    DELETE FROM scan_samples;
-
-    DELETE FROM scans;
-
-    DELETE FROM targets;
-    `
-  );
-
-}
-
-
-export async function scanTrend(days = 14) {
-
-  const result = await getDb().query(
-    `
-    SELECT
-      started_at,
-      online,
-      offline,
-      avg_latency
-    FROM scans
-    ORDER BY started_at DESC
-    LIMIT ?
-    `,
-    [days]
-  );
-
-
-  return result.values ?? [];
-
-}
-export async function categories() {
-
-  const result = await getDb().query(
-    `
-    SELECT DISTINCT category
-    FROM targets
-    ORDER BY category ASC
-    `
-  );
-
-
-  return (result.values ?? [])
-    .map((r:any) => r.category)
-    .filter(Boolean);
-
-}
-export async function getRecentResults(
-  limit = 200
-) {
-
-  const result = await getDb().query(
-    `
-    SELECT *
-    FROM targets
-    WHERE last_checked IS NOT NULL
-    ORDER BY last_checked DESC
-    LIMIT ?
-    `,
-    [
-      limit
-    ]
-  );
-
-
-  return (result.values as Target[]) ?? [];
 
 }
