@@ -234,18 +234,13 @@ DELETE FROM targets;
 `);
 
     await db.execute(
-      SCHEMA
-    );
+    console.log("SCHEMA EXECUTED");
 
-const tables =
-  await db.query(
-    "SELECT name FROM sqlite_master WHERE type='table'"
-  );
+const tables = await db.query(`
+  SELECT name FROM sqlite_master WHERE type='table'
+`);
 
-console.log(
-  "DATABASE TABLES:",
-  tables.values
-);
+console.log("DATABASE TABLES:", tables.values);
     
     await seedIfEmpty();
 const checkTargets = await db.query(
