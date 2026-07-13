@@ -1080,7 +1080,7 @@ export async function getRecentResults(
     `
     SELECT *
     FROM targets
-    WHERE status != 'unknown'
+    WHERE last_checked IS NOT NULL
     ORDER BY last_checked DESC
     LIMIT ?
     `,
