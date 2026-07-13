@@ -237,7 +237,16 @@ DELETE FROM targets;
       SCHEMA
     );
 
+const tables =
+  await db.query(
+    "SELECT name FROM sqlite_master WHERE type='table'"
+  );
 
+console.log(
+  "DATABASE TABLES:",
+  tables.values
+);
+    
     await seedIfEmpty();
 const checkTargets = await db.query(
   "SELECT COUNT(*) as c FROM targets"
