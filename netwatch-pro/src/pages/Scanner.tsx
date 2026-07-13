@@ -67,42 +67,34 @@ export default function Scanner() {
 
 
 
-  useEffect(()=>{
+useEffect(()=>{
 
+  const load = async()=>{
 
-    const load = async()=>{
-
-
-      const rows =
-        await getRecentResults(
-          200
-        );
-
-
-      setResults(rows);
-
-
-    };
-
-
-
-    load();
-
-
-
-    const timer =
-      setInterval(
-        load,
-        2000
+    const rows =
+      await getRecentResults(
+        scanCount
       );
 
+    setResults(rows);
+
+  };
 
 
-    return ()=>clearInterval(timer);
+  load();
 
 
+  const timer =
+    setInterval(
+      load,
+      2000
+    );
 
-  },[]);
+
+  return ()=>clearInterval(timer);
+
+
+},[scanCount]);
 
 
 
