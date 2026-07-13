@@ -744,8 +744,6 @@ export async function deleteTarget(
 
 
 
-
-
 export async function toggleFavorite(
   id: number
 ): Promise<void> {
@@ -765,54 +763,6 @@ export async function toggleFavorite(
   );
 
 }
-
-
-
-
-
-
-export async function deleteTarget(
- id:number
-):Promise<void>{
-
-
- await getDb().run(
-  "DELETE FROM targets WHERE id=?",
-  [id]
- );
-
-
-}
-
-
-
-
-
-
-export async function toggleFavorite(
- id:number
-):Promise<void>{
-
-
- await getDb().run(
- 
- UPDATE targets
- SET favorite =
- CASE favorite
- WHEN 1 THEN 0
- ELSE 1
- END
- WHERE id=?
- ,
- [id]
- );
-
-
-}
-
-
-
-
 
 
 export async function updateStatusMany(
