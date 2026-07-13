@@ -237,7 +237,14 @@ export async function initDatabase(): Promise<void> {
 
 
     await seedIfEmpty();
+const checkTargets = await db.query(
+  "SELECT COUNT(*) as c FROM targets"
+);
 
+console.log(
+  "DATABASE TARGET COUNT:",
+  checkTargets.values?.[0]?.c
+);
 
   })();
 
