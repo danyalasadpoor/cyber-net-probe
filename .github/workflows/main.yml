@@ -17,7 +17,7 @@ jobs:
           node-version: 24
 
       - name: Convert domains
-        run: node netwatch-pro/scripts/convert-domains.js
+        run: cd netwatch-pro && node scripts/convert-domains.js
 
       - name: Commit generated file
         run: |
