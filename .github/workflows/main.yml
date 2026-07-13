@@ -14,15 +14,18 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       - name: Convert domains
-        run: node scripts/convert-domains.js
+        run: node netwatch-pro/scripts/convert-domains.js
 
       - name: Commit generated file
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add src/data/targets-source.json
+
+          git add netwatch-pro/src/data/targets-source.json
+
           git commit -m "Generate targets-source.json" || exit 0
+
           git push
