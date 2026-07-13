@@ -407,7 +407,7 @@ return (
 
 
 
-    <GlassCard title={Recent Results (${results.length})}>
+    <GlassCard title={`Recent Results (${results.length})`}>
 
       <div className="space-y-2">
 
