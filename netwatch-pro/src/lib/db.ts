@@ -135,9 +135,7 @@ console.log(
 
 
 
-const SCHEMA = 
-
-
+const SCHEMA = `
 CREATE TABLE IF NOT EXISTS targets (
 
  id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -166,6 +164,33 @@ CREATE TABLE IF NOT EXISTS targets (
  (strftime('%s','now')*1000)
 
 );
+
+
+CREATE INDEX IF NOT EXISTS idx_targets_status
+ON targets(status);
+
+
+CREATE TABLE IF NOT EXISTS scans (
+
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+ scan_id TEXT NOT NULL,
+
+ target_id INTEGER,
+
+ status TEXT NOT NULL DEFAULT 'unknown',
+
+ latency REAL,
+
+ created_at INTEGER NOT NULL DEFAULT
+ (strftime('%s','now')*1000)
+
+);
+
+
+CREATE INDEX IF NOT EXISTS idx_scans_scan_id
+ON scans(scan_id);
+`;
 
 
 
