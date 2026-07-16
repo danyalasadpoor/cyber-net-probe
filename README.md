@@ -3,7 +3,7 @@
 ⚡ Advanced Local-First Network Monitoring for Android
 
 <p>
-  <strong>Scan Smarter • Monitor Locally • Stay in Control</strong>
+  <strong>Scan Smarter&nbsp;&nbsp;•&nbsp;&nbsp;Monitor Locally&nbsp;&nbsp;•&nbsp;&nbsp;Stay in Control</strong>
 </p><br><table>
 <tr>
 <td align="center"><h2>📦 LATEST ANDROID BUILD</h2><p><strong>Take control of your monitoring workflow.</strong></p><br><a href="https://github.com/danyalasadpoor/cyber-net-probe/releases/download/Netwatch-pro/Netwatch-pro.zip">
@@ -22,42 +22,51 @@
 </tr>
 </table><br><table>
 <tr>
-<td align="center"><h3>🛡️ LOCAL-FIRST</h3><p>Your monitoring data stays on your device.</p></td>
-<td align="center"><h3>⚡ FAST & POWERFUL</h3><p>Built for scalable target monitoring.</p></td>
-<td align="center"><h3>📱 ANDROID READY</h3><p>Designed for modern mobile workflows.</p></td>
+<td align="center">
+<h3>🛡️ LOCAL-FIRST</h3>
+<p>Your monitoring data stays on your device.</p>
+</td><td align="center">
+<h3>⚡ FAST & POWERFUL</h3>
+<p>Built for scalable target monitoring.</p>
+</td><td align="center">
+<h3>📱 ANDROID READY</h3>
+<p>Designed for modern mobile workflows.</p>
+</td>
 </tr>
 </table><br><h2>✨ WHAT'S INSIDE</h2><table>
 <tr>
-<td align="center"><h3>🔍 Scanner</h3>Configurable scanning<br>
+<td align="center">
+<h3>🔍 Scanner</h3>
+Configurable scanning<br>
 Concurrent workers<br>
 Real-time progress
-
-</td>
-<td align="center"><h3>📊 Analytics</h3>Live statistics<br>
+</td><td align="center">
+<h3>📊 Analytics</h3>
+Live statistics<br>
 Latency tracking<br>
 Scan history
-
-</td>
-<td align="center"><h3>🗃️ Local Database</h3>SQLite-powered storage<br>
+</td><td align="center">
+<h3>🗃️ Local Database</h3>
+SQLite-powered storage<br>
 Local-first architecture<br>
 Persistent data
-
 </td>
 </tr><tr>
-<td align="center"><h3>🎯 Target Management</h3>Organize targets<br>
+<td align="center">
+<h3>🎯 Target Management</h3>
+Organize targets<br>
 Categories & tags<br>
 Favorites
-
-</td>
-<td align="center"><h3>📥 Import & Export</h3>Backup & restore<br>
+</td><td align="center">
+<h3>📥 Import & Export</h3>
+Backup & restore<br>
 JSON workflows<br>
 CSV support
-
-</td>
-<td align="center"><h3>📱 Android Integration</h3>Capacitor runtime<br>
+</td><td align="center">
+<h3>📱 Android Integration</h3>
+Capacitor runtime<br>
 Native Android project<br>
 Mobile optimized
-
 </td>
 </tr>
 </table></div>---
@@ -66,27 +75,29 @@ Mobile optimized
 
 NetWatch Pro allows users to define exactly how many targets should be processed during a scan.
 
-Example Scan Sizes
+📏 Example Scan Sizes
 
-- 10 targets
-- 100 targets
-- 1,000 targets
-- 5,000 targets
-- 20,000+ targets
+- "10" targets
+- "100" targets
+- "1,000" targets
+- "5,000" targets
+- "20,000+" targets
+
+🧠 Scanner Capabilities
 
 The scanner is designed to support:
 
-- Configurable scan counts
-- Concurrent workers
-- Configurable request timeout
-- Progress tracking
-- Online/offline classification
-- Latency measurement
-- Scan speed calculation
-- ETA estimation
-- Scan cancellation support
-- Persistent scan history
-- Database-backed results
+- 🎯 Configurable scan counts
+- ⚡ Concurrent workers
+- ⏱️ Configurable request timeout
+- 📊 Progress tracking
+- 🟢 Online/offline classification
+- 📡 Latency measurement
+- 🚀 Scan speed calculation
+- ⏳ ETA estimation
+- ⏹️ Scan cancellation support
+- 🗃️ Persistent scan history
+- 💾 Database-backed results
 
 ---
 
@@ -94,18 +105,19 @@ The scanner is designed to support:
 
 Users can customize scanner behavior through the Settings panel.
 
-Request Timeout
+⏱️ Request Timeout
 
 Controls how long the scanner waits for a target response.
 
-- Minimum: "500 ms"
-- Maximum: "60,000 ms"
+Setting| Value
+Minimum| "500 ms"
+Maximum| "60,000 ms"
 
-Concurrency
+⚡ Concurrency
 
 Controls the number of simultaneous scan workers.
 
-- Range: "1 - 64 concurrent workers"
+Range: 1 - 64 concurrent workers
 
 This allows users to balance performance and device resource usage.
 
@@ -115,25 +127,25 @@ This allows users to balance performance and device resource usage.
 
 During scanning, NetWatch Pro is designed to track:
 
-- Total targets
-- Completed targets
-- Online targets
-- Offline targets
-- Current target
-- Scan speed
-- Estimated remaining time
-- Scan status
-- Start time
-- Completion time
+- 🎯 Total targets
+- ✅ Completed targets
+- 🟢 Online targets
+- 🔴 Offline targets
+- 🔎 Current target
+- 🚀 Scan speed
+- ⏳ Estimated remaining time
+- 📡 Scan status
+- 🕒 Start time
+- 🏁 Completion time
 
-Example
+📌 Example
 
-Total:     5,000
-Completed: 2,450
-Online:    1,920
-Offline:   530
-Speed:     42 targets/sec
-ETA:       60 seconds
+Total:       5,000
+Completed:   2,450
+Online:      1,920
+Offline:     530
+Speed:       42 targets/sec
+ETA:         60 seconds
 
 ---
 
@@ -141,48 +153,61 @@ ETA:       60 seconds
 
 NetWatch Pro uses SQLite for local data storage.
 
-The database contains the following tables:
+The database contains three main tables:
 
-"targets"
+🎯 "targets"
 
 Stores monitored targets and their current state.
 
-- "id"
-- "name"
-- "address"
-- "category"
-- "tags"
-- "notes"
-- "favorite"
-- "status"
-- "latency"
-- "availability"
-- "last_checked"
-- "created_at"
+Field| Description
+"id"| Unique target identifier
+"name"| Target name
+"address"| Target address
+"category"| Target category
+"tags"| Custom tags
+"notes"| Additional notes
+"favorite"| Favorite status
+"status"| Current target status
+"latency"| Latest measured latency
+"availability"| Availability information
+"last_checked"| Last check timestamp
+"created_at"| Creation timestamp
 
-"scans"
+---
 
-Stores scan sessions.
+📋 "scans"
 
-- "id"
-- "started_at"
-- "finished_at"
-- "total"
-- "online"
-- "offline"
-- "avg_latency"
-- "status"
+Stores complete scan sessions.
 
-"scan_samples"
+Field| Description
+"id"| Unique scan identifier
+"started_at"| Scan start time
+"finished_at"| Scan completion time
+"total"| Total targets processed
+"online"| Online target count
+"offline"| Offline target count
+"avg_latency"| Average latency
+"status"| Scan status
+
+Possible scan statuses include:
+
+running
+completed
+cancelled
+
+---
+
+📊 "scan_samples"
 
 Stores individual target results from scans.
 
-- "id"
-- "scan_id"
-- "target_id"
-- "status"
-- "latency"
-- "ts"
+Field| Description
+"id"| Sample identifier
+"scan_id"| Related scan
+"target_id"| Related target
+"status"| Result status
+"latency"| Measured latency
+"ts"| Result timestamp
 
 This structure allows NetWatch Pro to maintain historical scan information while keeping data local.
 
@@ -192,16 +217,16 @@ This structure allows NetWatch Pro to maintain historical scan information while
 
 The dashboard is designed to provide a clear overview of the monitoring environment.
 
-Planned and supported statistics include:
+📊 Available and Planned Statistics
 
-- Total targets
-- Online targets
-- Offline targets
-- Recent scan activity
-- Average latency
-- Target categories
-- Scan trends
-- Recent results
+- 🎯 Total targets
+- 🟢 Online targets
+- 🔴 Offline targets
+- 📡 Recent scan activity
+- ⚡ Average latency
+- 🏷️ Target categories
+- 📈 Scan trends
+- 🕒 Recent results
 
 ---
 
@@ -209,15 +234,15 @@ Planned and supported statistics include:
 
 Targets can be organized using:
 
-- Name
-- Address
-- Category
-- Tags
-- Notes
-- Favorite status
-- Current availability
-- Latency
-- Last check time
+- 📝 Name
+- 🌐 Address
+- 🏷️ Category
+- 🔖 Tags
+- 📄 Notes
+- ⭐ Favorite status
+- 📡 Current availability
+- ⚡ Latency
+- 🕒 Last check time
 
 This allows users to manage large collections of targets without relying on external services.
 
@@ -227,14 +252,14 @@ This allows users to manage large collections of targets without relying on exte
 
 Targets can be organized into categories such as:
 
-- General
-- Production
-- Development
-- Monitoring
-- Infrastructure
-- Websites
-- Services
-- Custom
+- 🌐 General
+- 🏭 Production
+- 🧪 Development
+- 📡 Monitoring
+- 🏗️ Infrastructure
+- 🌍 Websites
+- ⚙️ Services
+- 🛠️ Custom
 
 Tags can be used to create flexible custom organization systems.
 
@@ -246,10 +271,10 @@ Important targets can be marked as favorites.
 
 Favorites can be used to:
 
-- Quickly identify important targets
-- Filter target lists
-- Prioritize important services
-- Organize large target collections
+- 🔎 Quickly identify important targets
+- 🎯 Filter target lists
+- ⚡ Prioritize important services
+- 🗂️ Organize large target collections
 
 ---
 
@@ -259,14 +284,14 @@ NetWatch Pro supports local data management workflows.
 
 The application is designed to support:
 
-- Backup creation
-- Restore from backup
-- Target import
-- Data export
-- CSV workflows
-- JSON backup workflows
+- 💾 Backup creation
+- 🔄 Restore from backup
+- 📥 Target import
+- 📤 Data export
+- 📊 CSV workflows
+- 🗃️ JSON backup workflows
 
-Example Backup Structure
+📄 Example Backup Structure
 
 {
   "targets": [],
@@ -283,9 +308,9 @@ Users can create a complete local backup of application data.
 
 A backup can contain:
 
-- Targets
-- Scan history
-- Monitoring results
+- 🎯 Targets
+- 📋 Scan history
+- 📊 Monitoring results
 
 This makes it possible to migrate or restore application data without requiring a cloud backend.
 
@@ -295,10 +320,10 @@ This makes it possible to migrate or restore application data without requiring 
 
 The application includes database management tools such as:
 
-- Backup all data
-- Restore from backup
-- Wipe database
-- Reset local data
+- 💾 Backup all data
+- 🔄 Restore from backup
+- 🗑️ Wipe database
+- ♻️ Reset local data
 
 The database wipe action is intentionally protected by a confirmation prompt.
 
@@ -308,40 +333,40 @@ The database wipe action is intentionally protected by a confirmation prompt.
 
 The general workflow is:
 
-┌─────────────────────┐
-│   Add / Import      │
-│      Targets        │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│   Store in SQLite   │
-│    Local Database   │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│   Start Scan        │
-│  Configure Count    │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│ Concurrent Workers  │
-│   Process Targets   │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│  Collect Results    │
-│ Status + Latency    │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│  Save Scan History  │
-│   to SQLite         │
-└─────────────────────┘
+┌─────────────────────────────┐
+│       📥 Add / Import       │
+│           Targets           │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│       🗃️ Store in SQLite    │
+│        Local Database       │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│        🚀 Start Scan        │
+│       Configure Count       │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│       ⚡ Concurrent Workers │
+│        Process Targets      │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│       📊 Collect Results    │
+│       Status + Latency      │
+└──────────────┬──────────────┘
+               │
+               ▼
+┌─────────────────────────────┐
+│       💾 Save Scan History  │
+│          to SQLite          │
+└─────────────────────────────┘
 
 ---
 
@@ -349,104 +374,104 @@ The general workflow is:
 
 NetWatch Pro follows a modular architecture.
 
-NetWatch Pro
+🚀 NetWatch Pro
 │
-├── React
+├── ⚛️ React
 │   └── User Interface
 │
-├── TypeScript
+├── 🔷 TypeScript
 │   └── Type Safety
 │
-├── Vite
+├── ⚡ Vite
 │   └── Build System
 │
-├── Capacitor
+├── 📱 Capacitor
 │   └── Android Runtime
 │
-├── SQLite
+├── 🗃️ SQLite
 │   └── Local Data Storage
 │
-└── Scanner Engine
-    ├── Concurrency
-    ├── Timeout Management
-    ├── Progress Tracking
-    ├── Latency Measurement
-    └── Result Persistence
+└── 🔍 Scanner Engine
+    ├── ⚡ Concurrency
+    ├── ⏱️ Timeout Management
+    ├── 📊 Progress Tracking
+    ├── 📡 Latency Measurement
+    └── 💾 Result Persistence
 
 ---
 
 📁 Project Structure
 
-netwatch-pro/
+📦 netwatch-pro/
 │
-├── android/
+├── 📱 android/
 │   └── Android native project
 │
-├── public/
+├── 🌐 public/
 │   └── Static assets
 │
-├── src/
+├── 📂 src/
 │   │
-│   ├── components/
+│   ├── 🧩 components/
 │   │   └── Reusable UI components
 │   │
-│   ├── data/
-│   │   └── Target data sources
+│   ├── 📊 data/
+│   │   └── targets.json
 │   │
-│   ├── lib/
-│   │   ├── db.ts
-│   │   ├── scanner.ts
-│   │   ├── logger.ts
-│   │   ├── export.ts
-│   │   └── utils.ts
+│   ├── 🛠️ lib/
+│   │   ├── 🗃️ db.ts
+│   │   ├── 🔍 scanner.ts
+│   │   ├── 📝 logger.ts
+│   │   ├── 📤 export.ts
+│   │   └── 🔧 utils.ts
 │   │
-│   ├── pages/
-│   │   ├── Dashboard.tsx
-│   │   ├── Scanner.tsx
-│   │   ├── Targets.tsx
-│   │   ├── Results.tsx
-│   │   └── Settings.tsx
+│   ├── 📄 pages/
+│   │   ├── 📊 Dashboard.tsx
+│   │   ├── 🔍 Scanner.tsx
+│   │   ├── 🎯 Targets.tsx
+│   │   ├── 📋 Results.tsx
+│   │   └── ⚙️ Settings.tsx
 │   │
-│   ├── store/
+│   ├── 🧠 store/
 │   │   └── Application state
 │   │
-│   ├── types/
+│   ├── 🔷 types/
 │   │   └── TypeScript definitions
 │   │
-│   └── App.tsx
+│   └── 🚀 App.tsx
 │
-├── capacitor.config.ts
-├── package.json
-├── vite.config.ts
-└── README.md
+├── ⚙️ capacitor.config.ts
+├── 📦 package.json
+├── ⚡ vite.config.ts
+└── 📖 README.md
 
 ---
 
 🛠️ Tech Stack
 
-Frontend
+🎨 Frontend
 
-- React
-- TypeScript
-- Tailwind CSS
-- Lucide Icons
+- ⚛️ React
+- 🔷 TypeScript
+- 🎨 Tailwind CSS
+- 🧩 Lucide Icons
 
-Build System
+⚡ Build System
 
-- Vite
-- TypeScript Compiler
+- ⚡ Vite
+- 🔷 TypeScript Compiler
 
-Mobile
+📱 Mobile
 
-- Capacitor
-- Android
+- 📱 Capacitor
+- 🤖 Android
 
-Database
+🗃️ Database
 
 - SQLite
 - "@capacitor-community/sqlite"
 
-State Management
+🧠 State Management
 
 - Zustand-based application stores
 
@@ -454,22 +479,22 @@ State Management
 
 ⚡ Installation
 
-1. Clone the Repository
+1️⃣ Clone the Repository
 
 git clone https://github.com/danyalasa/cyber-net-probe.git
 cd cyber-net-probe
 
-2. Install Dependencies
+2️⃣ Install Dependencies
 
 npm install
 
-3. Start Development Server
+3️⃣ Start Development Server
 
 npm run dev
 
 The development server will then be available through the Vite development environment.
 
-4. Build the Web Application
+4️⃣ Build the Web Application
 
 npm run build
 
@@ -479,15 +504,15 @@ npm run build
 
 NetWatch Pro uses Capacitor to package the web application as an Android application.
 
-Build the Web Project
+1️⃣ Build the Web Project
 
 npm run build
 
-Synchronize Capacitor
+2️⃣ Synchronize Capacitor
 
 npx cap sync android
 
-Open Android Project
+3️⃣ Open the Android Project
 
 npx cap open android
 
@@ -497,16 +522,16 @@ The Android project can then be built using Android Studio.
 
 🔄 Development Workflow
 
-A typical development workflow:
+🧰 Initial Setup
 
 npm install
 npm run dev
 
-After making changes:
+🔨 After Making Changes
 
 npm run build
 
-Then synchronize Android:
+📱 Synchronize Android
 
 npx cap sync android
 
@@ -518,10 +543,10 @@ NetWatch Pro is designed around a local-first data model.
 
 The core application is designed so that:
 
-- Target data can remain on-device
-- Scan history can remain on-device
-- SQLite data is stored locally
-- No external server is required for the core local workflow
+- 📱 Target data can remain on-device
+- 📋 Scan history can remain on-device
+- 🗃️ SQLite data is stored locally
+- ☁️ No external server is required for the core local workflow
 
 Privacy and local data ownership are central design goals of the project.
 
@@ -533,12 +558,12 @@ NetWatch Pro is intended for legitimate monitoring, testing, administration, and
 
 Users are responsible for complying with:
 
-- Applicable laws
-- Terms of service
-- Network policies
-- Authorization requirements
+- ⚖️ Applicable laws
+- 📜 Terms of service
+- 🌐 Network policies
+- 🔐 Authorization requirements
 
-«Only scan systems and targets that you are authorized to monitor.»
+«⚠️ Only scan systems and targets that you are authorized to monitor.»
 
 ---
 
@@ -587,11 +612,11 @@ NetWatch Pro is an actively evolving project.
 
 The architecture is being continuously improved to support:
 
-- More targets
-- More efficient scanning
-- Better analytics
-- Better mobile performance
-- Better data management
+- 🎯 More targets
+- ⚡ More efficient scanning
+- 📈 Better analytics
+- 📱 Better mobile performance
+- 🗃️ Better data management
 
 The project is currently focused on building a strong foundation for a scalable local monitoring platform.
 
@@ -601,15 +626,15 @@ The project is currently focused on building a strong foundation for a scalable 
 
 Contributions, ideas, bug reports, and improvements are welcome.
 
-If you have an idea for improving NetWatch Pro:
+🛠️ Contribution Workflow
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test the project
-5. Open a Pull Request
+1. 🍴 Fork the repository
+2. 🌿 Create a feature branch
+3. ✏️ Make your changes
+4. 🧪 Test the project
+5. 🚀 Open a Pull Request
 
-Example:
+🌿 Example Feature Branch
 
 git checkout -b feature/my-improvement
 
@@ -619,13 +644,13 @@ git checkout -b feature/my-improvement
 
 When reporting a bug, please include:
 
-- Device model
-- Android version
-- Application version
-- Steps to reproduce
-- Expected behavior
-- Actual behavior
-- Relevant error messages
+- 📱 Device model
+- 🤖 Android version
+- 🏷️ Application version
+- 🔁 Steps to reproduce
+- 🎯 Expected behavior
+- ❌ Actual behavior
+- 📝 Relevant error messages
 
 This makes debugging significantly easier.
 
